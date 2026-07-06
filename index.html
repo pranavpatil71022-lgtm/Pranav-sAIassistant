@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pranav Patil — Aspiring Software Engineer</title>
+<style>
+  :root{
+    --bg:#07080d;
+    --bg-soft:#0d0f18;
+    --card:#12141f;
+    --line:rgba(255,255,255,0.08);
+    --text:#f3f4f8;
+    --muted:#9099ab;
+    --accent:#5b6cff;
+    --accent-2:#8a5cff;
+    --accent-soft:rgba(91,108,255,0.15);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  a{color:inherit; text-decoration:none;}
+  ul{list-style:none;}
+
+  /* ambient background glow */
+  body::before{
+    content:"";
+    position:fixed;
+    top:-20%; left:50%;
+    width:900px; height:900px;
+    transform:translateX(-50%);
+    background:radial-gradient(circle, rgba(91,108,255,0.12), transparent 65%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 48px;
+    background:rgba(7,8,13,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{font-size:1.25rem; font-weight:700;}
+  .logo span{color:var(--accent);}
+  nav ul{display:flex; gap:34px;}
+  nav a{color:var(--muted); font-size:0.95rem; font-weight:500; transition:color .2s;}
+  nav a.active, nav a:hover{color:var(--text);}
+  nav a.active{color:#7b8bff;}
+  .cv-btn{
+    border:1px solid var(--accent);
+    color:var(--accent);
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:0.9rem;
+    font-weight:600;
+    display:flex; align-items:center; gap:8px;
+    transition:background .2s, color .2s;
+  }
+  .cv-btn:hover{background:var(--accent); color:#fff;}
+
+  main{position:relative; z-index:1;}
+
+  .hero{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:40px;
+    align-items:center;
+    max-width:1400px;
+    margin:0 auto;
+    padding:70px 48px 90px;
+  }
+  .greet{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:0.9rem;
+    color:var(--muted);
+    margin-bottom:26px;
+  }
+  .hero h1{
+    font-size:3.6rem;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    line-height:1.05;
+  }
+  .hero .role{
+    font-size:2.4rem;
+    font-weight:800;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin-bottom:22px;
+  }
+  .hero p.tagline{
+    color:var(--muted);
+    font-size:1.05rem;
+    max-width:480px;
+    margin-bottom:28px;
+  }
+  .socials{display:flex; gap:14px; margin-bottom:34px;}
+  .socials a{
+    width:42px; height:42px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem;
+    color:var(--muted);
+    transition:all .2s;
+  }
+  .socials a:hover{border-color:var(--accent); color:var(--accent); transform:translateY(-2px);}
+  .cta-row{display:flex; gap:16px;}
+  .btn-primary{
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    color:#fff; font-weight:600;
+    padding:14px 26px;
+    border-radius:10px;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:filter .2s, transform .2s;
+  }
+  .btn-primary:hover{filter:brightness(1.1); transform:translateY(-1px);}
+  .btn-ghost{
+    border:1px solid var(--line);
+    color:var(--text);
+    font-weight:600;
+    padding:14px 26px;
+    border-radius:10px;
+    transition:border-color .2s, background .2s;
+  }
+  .btn-ghost:hover{border-color:var(--accent); background:var(--accent-soft);}
+
+  .image{ 
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .avatar-ring{
+    width:380px; height:380px;
+    border-radius:50%;
+    border:2px solid transparent;
+    background: linear-gradient(var(--bg), var(--bg)) padding-box,
+                linear-gradient(135deg, var(--accent), var(--accent-2)) border-box;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    box-shadow:0 0 70px rgba(91,108,255,0.25);
+    animation:float 6s ease-in-out infinite;
+  }
+  .avatar-ring img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+    display:block;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-14px);}
+  }
+  .image{ 
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+
+  section.about{
+    max-width:1400px;
+    margin:0 auto;
+    padding:60px 48px 100px;
+  }
+  .section-title{
+    font-size:2rem;
+    font-weight:800;
+    margin-bottom:10px;
+  }
+  .section-underline{
+    width:56px; height:4px;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius:2px;
+    margin-bottom:36px;
+  }
+  .about-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+  }
+  .about-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:30px;
+  }
+  .about-card h3{
+    display:flex; align-items:center; gap:12px;
+    font-size:1.2rem;
+    color:#8a95ff;
+    margin-bottom:16px;
+  }
+  .icon-badge{
+    width:38px; height:38px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem;
+  }
+  .about-card p{color:var(--muted); font-size:0.98rem;}
+
+  .timeline{list-style:none;}
+  .timeline li{
+    display:grid;
+    grid-template-columns:70px 1fr;
+    gap:16px;
+    position:relative;
+    padding-bottom:22px;
+  }
+  .timeline li:last-child{padding-bottom:0;}
+  .timeline li::before{
+    content:"";
+    position:absolute;
+    left:34px; top:20px; bottom:0;
+    width:2px;
+    background:var(--line);
+  }
+  .timeline li:last-child::before{display:none;}
+  .timeline .dot{
+    width:10px; height:10px;
+    border-radius:50%;
+    background:var(--muted);
+    justify-self:center;
+    margin-top:6px;
+    position:relative;
+    z-index:1;
+  }
+  .timeline li.future .dot{
+    background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+  .timeline .year{
+    font-weight:700;
+    font-size:0.92rem;
+    color:var(--text);
+  }
+  .timeline li.future .year{color:#8a95ff;}
+  .timeline .desc{color:var(--muted); font-size:0.95rem; margin-top:2px;}
+
+  /* Chat widget */
+  .chat-widget{
+    position:fixed;
+    bottom:24px; right:24px;
+    width:380px;
+    max-height:600px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    display:flex; flex-direction:column;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    z-index:100;
+    overflow:hidden;
+  }
+  .chat-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px;
+    border-bottom:1px solid var(--line);
+  }
+  .chat-header-left{display:flex; align-items:center; gap:12px;}
+  .bot-icon{
+    width:38px; height:38px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.2rem;
+  }
+  .chat-title{font-weight:700; font-size:0.98rem;}
+  .chat-status{font-size:0.78rem; color:#4ade80; display:flex; align-items:center; gap:6px;}
+  .chat-status::before{content:""; width:7px; height:7px; border-radius:50%; background:#4ade80;}
+  .chat-header-right{display:flex; gap:14px; color:var(--muted); font-size:1.05rem;}
+  .chat-header-right span{cursor:pointer; transition:color .2s;}
+  .chat-header-right span:hover{color:var(--text);}
+
+  .chat-body{
+    flex:1;
+    overflow-y:auto;
+    padding:18px;
+    display:flex; flex-direction:column;
+    gap:14px;
+    min-height:200px;
+    max-height:420px;
+  }
+  .chat-body::-webkit-scrollbar{width:6px;}
+  .chat-body::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
+
+  .msg-row{display:flex; gap:10px; align-items:flex-start;}
+  .msg-row.user{flex-direction:row-reverse;}
+  .msg-avatar{
+    width:30px; height:30px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.9rem;
+    flex-shrink:0;
+  }
+  .msg-bubble{
+    background:#1a1d2b;
+    padding:11px 14px;
+    border-radius:12px;
+    font-size:0.9rem;
+    max-width:75%;
+    color:var(--text);
+  }
+  .msg-row.user .msg-bubble{
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    color:#fff;
+  }
+  .msg-bubble ul{margin:6px 0 0 4px; padding-left:16px; list-style:disc;}
+  .msg-bubble a{color:#a9b8ff; text-decoration:underline;}
+  .msg-row.user .msg-bubble a{color:#fff;}
+
+  .typing-dots{display:flex; gap:4px; padding:4px 0;}
+  .typing-dots span{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--muted);
+    animation:blink 1.2s infinite ease-in-out;
+  }
+  .typing-dots span:nth-child(2){animation-delay:0.2s;}
+  .typing-dots span:nth-child(3){animation-delay:0.4s;}
+  @keyframes blink{0%,80%,100%{opacity:0.3;} 40%{opacity:1;}}
+
+  .chat-input-row{
+    display:flex; align-items:center; gap:10px;
+    padding:14px 16px;
+    border-top:1px solid var(--line);
+  }
+  .chat-input-row input{
+    flex:1;
+    background:#0d0f18;
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:11px 14px;
+    border-radius:10px;
+    font-size:0.9rem;
+    outline:none;
+  }
+  .chat-input-row input:focus{border-color:var(--accent);}
+  .send-btn{
+    width:40px; height:40px;
+    border-radius:10px;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem;
+    cursor:pointer;
+    flex-shrink:0;
+    border:none;
+    transition:filter .2s;
+  }
+  .send-btn:hover{filter:brightness(1.1);}
+  .send-btn:disabled{opacity:0.5; cursor:not-allowed;}
+
+  .chat-launcher{
+    position:fixed;
+    bottom:24px; right:24px;
+    width:60px; height:60px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(91,108,255,0.4);
+    z-index:99;
+    border:none;
+  }
+
+  footer{
+    text-align:center;
+    padding:30px;
+    color:var(--muted);
+    font-size:0.85rem;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width: 1000px){
+    .hero{grid-template-columns:1fr; text-align:center; padding:60px 24px 80px;}
+    .socials, .cta-row{justify-content:center;}
+    .cta-row{flex-wrap:wrap; gap:12px;}
+    .avatar-wrap{order:-1;}
+    .avatar-ring{width:260px; height:260px;}
+    .hero .role{font-size:1.8rem;}
+    .hero h1{font-size:2.4rem;}
+    .about{padding:50px 24px 80px;}
+    .about-grid{grid-template-columns:1fr;}
+    nav ul{flex-wrap:wrap; justify-content:center; gap:12px;}
+    header{padding:18px 22px; flex-wrap:wrap; gap:14px; justify-content:center;}
+    .chat-widget{width:min(92vw,380px); right:16px; left:16px; bottom:24px; max-height:80vh;}
+    .chat-body{max-height:calc(80vh - 180px);}
+    .chat-launcher{right:16px; bottom:16px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .avatar-ring{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Pranav <span>Patil</span></div>
+  <nav>
+    <ul>
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#certificates">Certificates</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <a href="#" class="cv-btn">Download CV ⬇</a>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <div>
+      <div class="greet">👋 Hello, I'm</div>
+      <h1>Pranav Patil</h1>
+      <div class="role">Aspiring Software Engineer</div>
+      <p class="tagline">I build modern, responsive websites and love turning ideas into real-world projects.</p>
+      <div class="socials">
+        <a href="#" aria-label="GitHub">🐙</a>
+        <a href="#" aria-label="LinkedIn">in</a>
+        <a href="#" aria-label="Instagram">📷</a>
+        <a href="#" aria-label="Email">✉</a>
+      </div>
+      <div class="cta-row">
+        <a href="#projects" class="btn-primary">View Projects →</a>
+        <a href="#contact" class="btn-ghost">Contact Me</a>
+      </div>
+    </div>
+    <div class="avatar-wrap">
+<div class="avatar-ring"><img src="myphoto.jpeg" alt="Pranav Patil"></div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="section-title">About Me</div>
+    <div class="section-underline"></div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3><span class="icon-badge">👤</span> Who I Am</h3>
+        <p>I'm a 17-year-old developer passionate about coding, problem solving, and building useful digital products. Currently preparing for JEE while building projects and improving my skills everyday.</p>
+      </div>
+      <div class="about-card">
+        <h3><span class="icon-badge">🚀</span> My Journey</h3>
+        <ul class="timeline">
+          <li>
+            <span class="dot"></span>
+            <div><span class="year">2023</span><div class="desc">Started my coding journey</div></div>
+          </li>
+          <li>
+            <span class="dot"></span>
+            <div><span class="year">2024</span><div class="desc">Built my first website</div></div>
+          </li>
+          <li>
+            <span class="dot"></span>
+            <div><span class="year">2025</span><div class="desc">Learning DSA and building projects</div></div>
+          </li>
+          <li class="future">
+            <span class="dot"></span>
+            <div><span class="year">Future</span><div class="desc">Software Engineer 🚀</div></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="skills">
+    <div class="section-title">Skills</div>
+    <div class="section-underline"></div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3><span class="icon-badge">💻</span> Web Development</h3>
+        <p>HTML, CSS, JavaScript, responsive design, and Git version control.</p>
+      </div>
+      <div class="about-card">
+        <h3><span class="icon-badge">🧠</span> Programming</h3>
+        <p>C, C++, problem solving, data structures, algorithms, and competitive coding practice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="projects">
+    <div class="section-title">Projects</div>
+    <div class="section-underline"></div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3><span class="icon-badge">🌐</span> Portfolio Site</h3>
+        <p>A personal portfolio built with HTML, CSS, and JavaScript to showcase skills and contact details.</p>
+      </div>
+      <div class="about-card">
+        <h3><span class="icon-badge">📱</span> Responsive UI</h3>
+        <p>Designing clean user interfaces focused on modern layouts and mobile friendliness.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="certificates">
+    <div class="section-title">Certificates</div>
+    <div class="section-underline"></div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3><span class="icon-badge">🎓</span> Learning Journey</h3>
+        <p>Preparing for JEE while learning software development, DSA, and web technologies.</p>
+      </div>
+      <div class="about-card">
+        <h3><span class="icon-badge">📄</span> Achievements</h3>
+        <p>Focused on building practical skills through projects and coding practice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="contact">
+    <div class="section-title">Contact</div>
+    <div class="section-underline"></div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3><span class="icon-badge">✉</span> Email</h3>
+        <p>You can reach Pranav at <a href="mailto:pranavpatil@example.com">pranavpatil@example.com</a>.</p>
+      </div>
+      <div class="about-card">
+        <h3><span class="icon-badge">🔗</span> Connect</h3>
+        <p>Find him on GitHub, LinkedIn, and Instagram through the social links above.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 Pranav Patil. Built with plain HTML, CSS & JavaScript.</footer>
+
+<button class="chat-launcher" id="chatLauncher">💬</button>
+
+<div class="chat-widget" id="chatWidget" style="display:none;">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="bot-icon">🤖</div>
+      <div>
+        <div class="chat-title">AI Assistant</div>
+        <div class="chat-status">Online</div>
+      </div>
+    </div>
+    <div class="chat-header-right">
+      <span id="resetChat" title="Reset chat">↻</span>
+      <span id="closeChat" title="Close">✕</span>
+    </div>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Type your message...">
+    <button class="send-btn" id="sendBtn">➤</button>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are Pranav Patil's AI Assistant on his personal portfolio website. Answer questions from visitors about Pranav in a friendly, concise way (2-4 sentences max, using bullet points when listing things).
+
+Facts about Pranav:
+- 17-year-old aspiring software engineer, currently preparing for JEE (Indian engineering entrance exam)
+- Skills: HTML, CSS, JavaScript, C, C++, Data Structures & Algorithms, Git & GitHub, Problem Solving
+- Journey: Started coding in 2023, built his first website in 2024, currently (2025) learning DSA and building projects, aiming to become a Software Engineer
+- He builds modern, responsive websites and enjoys turning ideas into real projects
+- Contact: via the Contact section on this site, or email at pranavpatil@example.com
+- He has GitHub, LinkedIn, and Instagram profiles linked on the site
+
+Only answer questions about Pranav, his skills, background, and how to contact him. If asked something unrelated, gently steer back to being his portfolio assistant. Keep replies short and readable on a small chat widget.`;
+
+const chatBody = document.getElementById('chatBody');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const chatWidget = document.getElementById('chatWidget');
+const chatLauncher = document.getElementById('chatLauncher');
+const closeChat = document.getElementById('closeChat');
+const resetChat = document.getElementById('resetChat');
+
+let history = [];
+
+function addMessage(role, html){
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (role === 'user' ? 'user' : 'bot');
+  row.innerHTML = `
+    <div class="msg-avatar">${role === 'user' ? '🙂' : '🤖'}</div>
+    <div class="msg-bubble">${html}</div>
+  `;
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return row;
+}
+
+function addTyping(){
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.id = 'typingRow';
+  row.innerHTML = `
+    <div class="msg-avatar">🤖</div>
+    <div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+  `;
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function removeTyping(){
+  const t = document.getElementById('typingRow');
+  if(t) t.remove();
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatBotText(text){
+  // basic markdown-ish: bullet lines starting with "- " become <ul><li>
+  const lines = text.split('\n').filter(l => l.trim() !== '');
+  let html = '';
+  let inList = false;
+  for(const line of lines){
+    const trimmed = line.trim();
+    if(trimmed.startsWith('- ') || trimmed.startsWith('• ')){
+      if(!inList){ html += '<ul>'; inList = true; }
+      html += `<li>${escapeHtml(trimmed.replace(/^[-•]\s*/, ''))}</li>`;
+    } else {
+      if(inList){ html += '</ul>'; inList = false; }
+      html += `<div>${escapeHtml(trimmed)}</div>`;
+    }
+  }
+  if(inList) html += '</ul>';
+  // simple email/link detection
+  html = html.replace(/([\w.-]+@[\w.-]+\.\w+)/g, '<a href="mailto:$1">$1</a>');
+  return html;
+}
+
+const cannedReplies = [
+  {pattern: /name|who are you|who is pranav/, reply: "I’m Pranav’s AI assistant. Ask about his skills, projects, or contact info."},
+  {pattern: /skill|technology|stack|tech/, reply: "Pranav works with HTML, CSS, JavaScript, C, C++, data structures, algorithms, Git/GitHub, and responsive web design."},
+  {pattern: /project|website|portfolio/, reply: "He builds modern, responsive websites and is growing his portfolio with real projects."},
+  {pattern: /contact|email|reach/, reply: "You can contact Pranav via the Contact section or email at pranavpatil@example.com."},
+];
+
+function getMockReply(text){
+  const normalized = text.toLowerCase();
+  for(const item of cannedReplies){
+    if(item.pattern.test(normalized)) return item.reply;
+  }
+  return "I’m here to help with questions about Pranav’s skills, background, and contact details.";
+}
+
+async function sendMessage(){
+  const text = chatInput.value.trim();
+  if(!text) return;
+  addMessage('user', escapeHtml(text));
+  history.push({role:'user', content: text});
+  chatInput.value = '';
+  sendBtn.disabled = true;
+  addTyping();
+
+  await new Promise(resolve => setTimeout(resolve, 600));
+  removeTyping();
+
+  const replyText = getMockReply(text);
+  addMessage('bot', formatBotText(replyText));
+  history.push({role:'assistant', content: replyText});
+  sendBtn.disabled = false;
+}
+
+sendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+chatLauncher.addEventListener('click', () => {
+  chatWidget.style.display = 'flex';
+  chatLauncher.style.display = 'none';
+});
+closeChat.addEventListener('click', () => {
+  chatWidget.style.display = 'none';
+  chatLauncher.style.display = 'flex';
+});
+resetChat.addEventListener('click', () => {
+  history = [];
+  chatBody.innerHTML = '';
+  addMessage('bot', formatBotText("Hi! I'm Pranav's AI Assistant 🤖\nHow can I help you today?"));
+});
+
+// initial greeting
+addMessage('bot', formatBotText("Hi! I'm Pranav's AI Assistant 🤖\nHow can I help you today?"));
+
+// nav active state on scroll (simple)
+const navLinks = document.querySelectorAll('nav a');
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
