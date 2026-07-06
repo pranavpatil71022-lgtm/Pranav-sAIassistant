@@ -57,7 +57,7 @@
   nav a{color:var(--muted); font-size:0.95rem; font-weight:500; transition:color .2s;}
   nav a.active, nav a:hover{color:var(--text);}
   nav a.active{color:#7b8bff;}
-  .cv-btn{
+  .enquiry-btn{
     border:1px solid var(--accent);
     color:var(--accent);
     padding:10px 18px;
@@ -66,8 +66,58 @@
     font-weight:600;
     display:flex; align-items:center; gap:8px;
     transition:background .2s, color .2s;
+    cursor:pointer;
+    background:transparent;
   }
-  .cv-btn:hover{background:var(--accent); color:#fff;}
+  .enquiry-btn:hover{background:var(--accent); color:#fff;}
+
+  .enquiry-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    padding:20px;
+  }
+  .enquiry-modal.active{display:flex;}
+  .enquiry-card{
+    width:min(460px, 100%);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:24px;
+    position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,0.45);
+  }
+  .enquiry-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:34px; height:34px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    color:#fff;
+    cursor:pointer;
+    font-size:1.1rem;
+  }
+  .enquiry-card h3{font-size:1.2rem; margin-bottom:8px;}
+  .enquiry-card p{color:var(--muted); margin-bottom:18px; font-size:0.95rem;}
+  .enquiry-card label{display:block; margin-bottom:8px; font-weight:600; font-size:0.95rem;}
+  .enquiry-card input{
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--line); background:#0d0f18; color:var(--text); margin-bottom:14px; outline:none; font-size:1rem;
+  }
+  @media (max-width: 600px){
+    .enquiry-card{padding:20px;}
+    .enquiry-card h3{font-size:1.1rem;}
+    .enquiry-card p{font-size:0.9rem;}
+  }
+  .enquiry-card input:focus{border-color:var(--accent);}
+  .enquiry-submit{
+    width:100%; padding:12px 14px; border:none; border-radius:10px; background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff; font-weight:700; cursor:pointer;
+  }
 
   main{position:relative; z-index:1;}
 
@@ -163,6 +213,15 @@
     object-fit:cover;
     border-radius:50%;
     display:block;
+  }
+  .profile-photo-small{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid rgba(255,255,255,0.15);
+    box-shadow:0 10px 24px rgba(0,0,0,0.2);
+    flex-shrink:0;
   }
   @keyframes float{
     0%,100%{transform:translateY(0);}
@@ -445,17 +504,24 @@
   .chat-launcher{
     position:fixed;
     bottom:24px; right:24px;
-    width:82px; height:82px;
-    border-radius:50%;
-    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.3) 16%, rgba(91,108,255,0.9) 32%, rgba(138,92,255,0.9) 100%);
-    display:grid; place-items:center;
-    font-size:2rem;
+    min-width:132px;
+    min-height:90px;
+    padding:10px 14px;
+    border-radius:24px;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    font-size:1.05rem;
+    font-weight:700;
+    color:#fff;
     cursor:pointer;
-    box-shadow:0 26px 70px rgba(91,108,255,0.28), 0 0 0 10px rgba(91,108,255,0.08);
+    box-shadow:0 24px 70px rgba(91,108,255,0.35), 0 0 0 10px rgba(91,108,255,0.10);
     z-index:99;
-    border:2px solid rgba(255,255,255,0.22);
+    border:2px solid rgba(255,255,255,0.18);
     transition:transform .2s, box-shadow .2s, filter .2s;
     overflow:hidden;
+    animation:pulseLauncher 2.2s ease-in-out infinite;
+    user-select:none;
+    touch-action:none;
   }
   .chat-launcher::before{
     content:"";
@@ -479,20 +545,33 @@
     pointer-events:none;
   }
   .chat-launcher:hover{
-    transform:translateY(-4px) scale(1.05);
+    transform:translateY(-4px) scale(1.03);
     box-shadow:0 30px 90px rgba(91,108,255,0.45), 0 0 0 14px rgba(91,108,255,0.08);
     filter:brightness(1.05);
   }
+  .chat-launcher.dragging{cursor:grabbing; transform:scale(1.02);}
   .chat-launcher .launcher-icon{
     position:relative;
     z-index:1;
     color:#fff;
-    font-size:2rem;
+    font-size:1.35rem;
     text-shadow:0 0 20px rgba(255,255,255,0.45);
+  }
+  .chat-launcher .launcher-label{
+    position:relative;
+    z-index:1;
+    font-size:0.9rem;
+    letter-spacing:0.01em;
+    line-height:1.1;
+    text-align:center;
   }
   @keyframes launcherGlow{
     0%,100%{opacity:0.55; transform:translate(-50%, -50%) scale(1);}
     50%{opacity:0.12; transform:translate(-50%, -50%) scale(1.08);}
+  }
+  @keyframes pulseLauncher{
+    0%,100%{transform:scale(1);} 
+    50%{transform:scale(1.03);} 
   }
 
   footer{
@@ -539,16 +618,18 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
-  <a href="#" class="cv-btn">Download CV ⬇</a>
+  <button class="enquiry-btn" id="openEnquiry">Enquiry ✉</button>
 </header>
 
 <main>
   <section class="hero" id="home">
     <div>
       <div class="greet">👋 Hello, I'm</div>
-      <h1>Pranav Patil</h1>
-      <div class="role">Aspiring Software Engineer</div>
-      <p class="tagline">I build modern, responsive websites and love turning ideas into real-world projects.</p>
+      <div style="margin-bottom:18px;">
+        <h1>Pranav Patil</h1>
+        <div class="role">Aspiring Software Engineer</div>
+      </div>
+      <p class="tagline">Hi, I'm Pranav Ganesh Patil, an aspiring Software Engineer and passionate Web Developer from Maharashtra, India. I enjoy building modern, responsive websites and continuously learning new technologies. I'm currently strengthening my skills in HTML, CSS, JavaScript, C, C++, Git, and GitHub while working toward becoming a Full-Stack Developer. This portfolio showcases my projects, skills, and learning journey.</p>
       <div class="socials">
         <a href="https://github.com/pranavpatil71022-lgtm" aria-label="GitHub" target="_blank" rel="noopener noreferrer">🐙</a>
         <a href="https://www.linkedin.com/in/pranav-g-patil-6230aa365?utm_source=share_via&utm_content=profile&utm_medium=member_android" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">in</a>
@@ -571,26 +652,26 @@
     <div class="about-grid">
       <div class="about-card">
         <h3><span class="icon-badge">👤</span> Who I Am</h3>
-        <p>I'm a 17-year-old developer passionate about coding, problem solving, and building useful digital products. Currently preparing for JEE while building projects and improving my skills everyday.</p>
+        <p>Hi, I'm Pranav Ganesh Patil, an aspiring Software Engineer and passionate Web Developer from Maharashtra, India. I enjoy building modern, responsive websites and continuously learning new technologies. I'm currently strengthening my skills in HTML, CSS, JavaScript, C, C++, Git, and GitHub while working toward becoming a Full-Stack Developer. This portfolio showcases my projects, skills, and learning journey.</p>
       </div>
       <div class="about-card">
         <h3><span class="icon-badge">🚀</span> My Journey</h3>
         <ul class="timeline">
           <li>
             <span class="dot"></span>
-            <div><span class="year">2023</span><div class="desc">Started my coding journey</div></div>
+            <div><span class="year">2025</span><div class="desc">Started coding</div></div>
           </li>
           <li>
             <span class="dot"></span>
-            <div><span class="year">2024</span><div class="desc">Built my first website</div></div>
+            <div><span class="year">2025</span><div class="desc">Built first website</div></div>
           </li>
           <li>
             <span class="dot"></span>
-            <div><span class="year">2025</span><div class="desc">Learning DSA and building projects</div></div>
+            <div><span class="year">2026</span><div class="desc">Improved DSA and projects</div></div>
           </li>
           <li class="future">
             <span class="dot"></span>
-            <div><span class="year">Future</span><div class="desc">Software Engineer 🚀</div></div>
+            <div><span class="year">2027</span><div class="desc">Working toward becoming a Software Engineer 🚀</div></div>
           </li>
         </ul>
       </div>
@@ -660,7 +741,21 @@
 
 <footer>© 2026 Pranav Patil. Built with plain HTML, CSS & JavaScript.</footer>
 
+<div class="enquiry-modal" id="enquiryModal">
+  <div class="enquiry-card">
+    <button class="enquiry-close" id="closeEnquiry" aria-label="Close enquiry form">✕</button>
+    <h3>Enquiry Form</h3>
+    <p>Fill in your details and I’ll contact you soon.</p>
+    <label for="fullName">Full Name</label>
+    <input id="fullName" name="name" type="text" placeholder="Enter your full name">
+    <label for="mobileNumber">Mobile Number</label>
+    <input id="mobileNumber" name="mobile" type="tel" placeholder="Enter your mobile number">
+    <button class="enquiry-submit" id="submitEnquiry" type="button">Submit</button>
+  </div>
+</div>
+
 <button class="chat-launcher" id="chatLauncher" aria-label="Open AI assistant">
+  <span class="launcher-label">Ask to Pranav's AI</span>
   <span class="launcher-icon">🤖</span>
 </button>
 
@@ -693,7 +788,7 @@ const SYSTEM_PROMPT = `You are Pranav Patil's AI Assistant on his personal portf
 Facts about Pranav:
 - 17-year-old aspiring software engineer, currently preparing for JEE (Indian engineering entrance exam)
 - Skills: HTML, CSS, JavaScript, C, C++, Data Structures & Algorithms, Git & GitHub, Problem Solving
-- Journey: Started coding in 2025, built his first website in 2026, currently (2026) learning DSA and building projects, aiming to become a Software Engineer
+- Journey: Started coding in 2023, built his first website in 2024, strengthened DSA and projects in 2025, and is working toward becoming a Software Engineer in 2026
 - He builds modern, responsive websites and enjoys turning ideas into real projects
 - Contact: via the Contact section on this site, or email at pranavpatil71025@gmail.com
 - He has GitHub, LinkedIn, and Instagram profiles linked on the site
@@ -708,6 +803,12 @@ const chatLauncher = document.getElementById('chatLauncher');
 const closeChat = document.getElementById('closeChat');
 const minimizeChat = document.getElementById('minimizeChat');
 const resetChat = document.getElementById('resetChat');
+const openEnquiry = document.getElementById('openEnquiry');
+const enquiryModal = document.getElementById('enquiryModal');
+const closeEnquiry = document.getElementById('closeEnquiry');
+const submitEnquiry = document.getElementById('submitEnquiry');
+const fullNameInput = document.getElementById('fullName');
+const mobileInput = document.getElementById('mobileNumber');
 
 let history = [];
 
@@ -754,6 +855,12 @@ let dragStartX = 0;
 let dragStartY = 0;
 let startLeft = 0;
 let startTop = 0;
+let isLauncherDragging = false;
+let launcherDragStartX = 0;
+let launcherDragStartY = 0;
+let launcherStartLeft = 0;
+let launcherStartTop = 0;
+let launcherMoved = false;
 
 function onDragStart(e){
   isDragging = true;
@@ -784,6 +891,39 @@ function onDragEnd(){
   chatWidget.classList.remove('dragging');
 }
 
+function onLauncherDragStart(e){
+  isLauncherDragging = true;
+  launcherMoved = false;
+  const rect = chatLauncher.getBoundingClientRect();
+  launcherDragStartX = e.clientX;
+  launcherDragStartY = e.clientY;
+  launcherStartLeft = rect.left;
+  launcherStartTop = rect.top;
+  chatLauncher.style.right = 'auto';
+  chatLauncher.style.bottom = 'auto';
+  chatLauncher.style.left = `${rect.left}px`;
+  chatLauncher.style.top = `${rect.top}px`;
+  chatLauncher.classList.add('dragging');
+  e.preventDefault();
+}
+
+function onLauncherDragMove(e){
+  if(!isLauncherDragging) return;
+  const dx = e.clientX - launcherDragStartX;
+  const dy = e.clientY - launcherDragStartY;
+  if(Math.abs(dx) + Math.abs(dy) > 3) launcherMoved = true;
+  const nextLeft = Math.min(Math.max(launcherStartLeft + dx, 12), window.innerWidth - chatLauncher.offsetWidth - 12);
+  const nextTop = Math.min(Math.max(launcherStartTop + dy, 12), window.innerHeight - chatLauncher.offsetHeight - 12);
+  chatLauncher.style.left = `${nextLeft}px`;
+  chatLauncher.style.top = `${nextTop}px`;
+}
+
+function onLauncherDragEnd(){
+  if(!isLauncherDragging) return;
+  isLauncherDragging = false;
+  chatLauncher.classList.remove('dragging');
+}
+
 function escapeHtml(str){
   const div = document.createElement('div');
   div.textContent = str;
@@ -812,7 +952,7 @@ function formatBotText(text){
 }
 
 const cannedReplies = [
-  {pattern: /name|who are you|who is pranav/, reply: "I’m Pranav’s AI assistant. Ask about his skills, projects, or contact info."},
+  {pattern: /who are you|who is pranav|more about pranav's AI Assistant/, reply: "I’m Pranav’s AI assistant. Ask about his skills, projects, or contact info."},
   {pattern: /skill|technology|stack|tech/, reply: "Pranav works with HTML, CSS, JavaScript, C, C++, data structures, algorithms, Git/GitHub, and responsive web design."},
   {pattern: /project|website|portfolio/, reply: "He builds modern, responsive websites and is growing his portfolio with real projects."},
   {pattern: /contact|email|reach/, reply: "You can contact Pranav via the Contact section or email at pranavpatil71025@gmail.com."},
@@ -837,16 +977,266 @@ const cannedReplies = [
   {pattern: /prakalp|website|portfolio/, reply: "To aadunik, responsive websites tayar karto ani vastavik prakalpan sobat tyache portfolio vadhavto aahe."},
   {pattern: /sampark|email|pahunch/, reply: "Aapan sampark vibhag dwara kiva email dwara Pranav sobat sampark sadhoo shakta."},
   {pattern: /pravas|parshvabhoomi|anubhav|kam kay krto/, reply: "Pranavne 2025 madhe coding suru keli, 2026 madhe tyachi pahili website sobat swatacha AI Assistant tayar kela ani sadhya DSA shikat aahe ani prakalp tayar kart aahe."},
-  {pattern: /vay|kiti varsha/, reply: "Pranav 17 varshacha aahe ani to JEE sathi tayyari karanara ek mahatvakanakshi software engineer aahe."},
-  {pattern: /to kuthe rahto|kuthun aahe|kuthlya gavat aahe/, reply: "Pranav Talkheda, Maharashtra, India madhe rahato."},
+  {pattern: /vay|kiti varsha|pranav che vay/, reply: "Pranav 17 varshacha aahe ani to JEE sathi tayyari karanara ek ichhuk software engineer aahe."},
+  {pattern: /to kuthe rahto|kuthun aahe|kuthlya gavat aahe|pranav kontya gavcha ahe|kuthun ahe|kontya gavcha ahe|rahato/, reply: "Pranav Talkheda, Maharashtra, India madhe rahato."},
+  // ================= ABOUT =================
+{pattern: /name|full name|what is your name/, reply: "His full name is Pranav Ganesh Patil."},
+{pattern: /nickname|nick name/, reply: "Most people call him Pannu."},
+{pattern: /gender/, reply: "Pranav is male."},
+{pattern: /religion/, reply: "This portfolio focuses on Pranav's skills and projects."},
+{pattern: /nationality/, reply: "Pranav is Indian."},
+{pattern: /country/, reply: "He lives in India."},
+{pattern: /state/, reply: "He belongs to Maharashtra."},
+{pattern: /district/, reply: "He is from Jalgaon district."},
+{pattern: /city|town/, reply: "He is from Talkheda, Maharashtra."},
+{pattern: /language|languages/, reply: "He speaks Marathi, Hindi, and English."},
+
+// ================= EDUCATION =================
+{pattern: /study|education/, reply: "Pranav is preparing for JEE while improving his programming skills."},
+{pattern: /school|college/, reply: "He is currently focused on entrance exam preparation."},
+{pattern: /jee/, reply: "He is preparing for the JEE engineering entrance examination."},
+{pattern: /goal|dream/, reply: "His goal is to become a software engineer in a top product-based company."},
+{pattern: /future plan/, reply: "He plans to become a full-stack developer and AI engineer."},
+
+// ================= SKILLS =================
+{pattern: /frontend/, reply: "He enjoys building responsive frontend websites using HTML, CSS, and JavaScript."},
+{pattern: /backend/, reply: "He is currently learning backend development."},
+{pattern: /database|sql/, reply: "He plans to work with SQL and databases in future projects."},
+{pattern: /programming language/, reply: "He works with HTML, CSS, JavaScript, C, and C++."},
+{pattern: /problem solving/, reply: "He practices problem-solving and DSA regularly."},
+{pattern: /dsa|data structures/, reply: "He is learning Data Structures and Algorithms for interviews."},
+{pattern: /algorithm/, reply: "Algorithms are one of the skills he is improving every day."},
+{pattern: /responsive/, reply: "Yes, he builds responsive websites that work on mobile and desktop."},
+
+// ================= PROJECTS =================
+{pattern: /latest project/, reply: "His latest project is an AI-powered personal portfolio website."},
+{pattern: /portfolio/, reply: "His portfolio showcases projects, skills, and contact information."},
+{pattern: /chatbot/, reply: "This website includes a custom AI chatbot developed by Pranav."},
+{pattern: /website/, reply: "He develops modern, responsive websites using web technologies."},
+{pattern: /github project/, reply: "You can find his coding projects on GitHub."},
+
+// ================= EXPERIENCE =================
+{pattern: /experience/, reply: "He is building experience through personal projects and continuous learning."},
+{pattern: /internship/, reply: "He is looking forward to internship opportunities."},
+{pattern: /freelance/, reply: "He is open to freelance web development opportunities."},
+{pattern: /job/, reply: "His long-term goal is to work at a leading product-based company."},
+
+// ================= HOBBIES =================
+{pattern: /hobby|hobbies/, reply: "His hobbies include coding, learning new technologies, and building projects."},
+{pattern: /favorite language/, reply: "He enjoys JavaScript and C++."},
+{pattern: /favorite subject/, reply: "Computer Science and Mathematics are his favorite subjects."},
+{pattern: /free time/, reply: "He spends his free time coding, learning, and improving his skills."},
+
+// ================= AI =================
+{pattern: /who made you|creator|developer/, reply: "I was developed by Pranav as part of his AI portfolio."},
+{pattern: /are you chatgpt/, reply: "No. I'm Pranav's custom AI assistant inspired by modern AI chatbots."},
+{pattern: /can you code/, reply: "Yes. I can answer questions about coding and Pranav's work."},
+{pattern: /ai assistant/, reply: "I'm an AI assistant created to help visitors learn about Pranav."},
+
+// ================= CONTACT =================
+{pattern: /phone|mobile number/, reply: "Please use the Contact section for communication."},
+{pattern: /email/, reply: "Email: pranavpatil71025@gmail.com"},
+{pattern: /linkedin/, reply: "You can connect with Pranav through LinkedIn."},
+{pattern: /github/, reply: "Visit his GitHub profile to see his projects."},
+{pattern: /instagram/, reply: "You can find his Instagram through the social links."},
+{pattern: /hire|hire him/, reply: "Yes! Feel free to contact Pranav for web development opportunities."},
+
+// ================= TECHNOLOGY =================
+{pattern: /html/, reply: "HTML is one of Pranav's core web development skills."},
+{pattern: /css/, reply: "He creates responsive designs using modern CSS."},
+{pattern: /javascript|js/, reply: "JavaScript is one of his favorite programming languages."},
+{pattern: /c language/, reply: "He has learned C programming fundamentals."},
+{pattern: /c\+\+|cpp/, reply: "He uses C++ for DSA and competitive programming."},
+{pattern: /react/, reply: "React is on his learning roadmap."},
+{pattern: /node/, reply: "Node.js is one of the backend technologies he plans to master."},
+{pattern: /python/, reply: "Python is on his future learning roadmap."},
+{pattern: /git/, reply: "He uses Git for version control."},
+{pattern: /github/, reply: "GitHub is where he publishes his coding projects."},
+
+// ================= PERSONALITY =================
+{pattern: /strength/, reply: "Consistency, curiosity, and willingness to learn are his strengths."},
+{pattern: /weakness/, reply: "He believes every challenge is an opportunity to improve."},
+{pattern: /motivation/, reply: "His motivation is to keep learning and building useful software."},
+{pattern: /hardworking/, reply: "Yes. He enjoys learning new technologies every day."},
+{pattern: /teamwork/, reply: "He believes teamwork and collaboration are essential for software development."},
+{pattern: /leadership/, reply: "He enjoys taking responsibility and learning from experienced developers."},
+
+// ================= SERVICES =================
+{pattern: /services/, reply: "He can build responsive websites, landing pages, portfolios, and frontend applications."},
+{pattern: /landing page/, reply: "Yes, he can create responsive landing pages."},
+{pattern: /business website/, reply: "Yes, he can build modern business websites."},
+{pattern: /portfolio website/, reply: "Yes, portfolio websites are one of his specialties."},
+
+// ================= WEBSITE =================
+{pattern: /dark mode/, reply: "The website supports a modern dark theme."},
+{pattern: /theme/, reply: "The website is designed with a modern UI inspired by AI applications."},
+{pattern: /mobile friendly/, reply: "Yes. The website is responsive across devices."},
+{pattern: /animation/, reply: "The website includes smooth modern animations."},
+
+// ================= GENERAL =================
+{pattern: /thank you so much/, reply: "You're very welcome! 😊"},
+{pattern: /good morning/, reply: "Good morning! Hope you're having a great day."},
+{pattern: /good afternoon/, reply: "Good afternoon! How can I help you?"},
+{pattern: /good evening/, reply: "Good evening! Welcome to Pranav's portfolio."},
+{pattern: /good night/, reply: "Good night! Have a wonderful rest."},
+{pattern: /bye/, reply: "Goodbye! Thanks for visiting Pranav's portfolio."},
+{pattern: /how are you/, reply: "I'm doing great! Thanks for asking. How can I help?"},
+{pattern: /who are you/, reply: "I'm Pranav's AI assistant. Ask me anything about his skills, projects, or journey."},
+{pattern: /what can you do/, reply: "I can answer questions about Pranav, his skills, projects, education, and contact information."},
+{pattern: /help/, reply: "You can ask about skills, projects, experience, education, contact details, or technologies."},
+{pattern: /thanks/, reply: "Happy to help! 😊"},
+// ================= PERSONAL =================
+{pattern:/birthday|date of birth|dob/i,reply:"Pranav was born in 2009."},
+{pattern:/zodiac|star sign/i,reply:"I don't have information about his zodiac sign."},
+{pattern:/middle name/i,reply:"His full name is Pranav Ganesh Patil."},
+{pattern:/surname|last name/i,reply:"His surname is Dhenge Patil."},
+{pattern:/father/i,reply:"This portfolio focuses on Pranav's professional journey."},
+{pattern:/mother/i,reply:"Personal family information isn't shared here."},
+{pattern:/brother/i,reply:"Pranav has a brother Aditya Patil."},
+{pattern:/sister/i,reply:"Information about siblings isn't publicly listed."},
+{pattern:/Friend/i,reply:"He have a friend name Om Gavale and more would be."},
+{pattern:/married|wife|girlfriend/i,reply:"Pranav is currently focused on studies and software development."},
+{pattern:/relationship/i,reply:"Personal relationship information isn't available."},
+{pattern:/height/i,reply:"Height information isn't available."},
+{pattern:/weight/i,reply:"Weight information isn't available."},
+{pattern:/blood group/i,reply:"Blood group information isn't public."},
+{pattern:/pet|dog|cat/i,reply:"No information about pets is available."},
+{pattern:/favorite color/i,reply:"His favorite color isn't officially listed."},
+{pattern:/favorite food/i,reply:"Food preferences aren't listed on this portfolio."},
+{pattern:/favorite movie/i,reply:"Movie preferences aren't available."},
+{pattern:/favorite actor/i,reply:"No public information is available."},
+{pattern:/favorite sport/i,reply:"Sports preferences aren't listed."},
+{pattern:/favorite book/i,reply:"his favorite book is the alchemist by paulo coelho."},
+
+// ================= CODING =================
+{pattern:/coding/i,reply:"Pranav enjoys coding and continuously learning new technologies."},
+{pattern:/programmer/i,reply:"Yes. He is an aspiring software engineer and programmer."},
+{pattern:/developer/i,reply:"Pranav is a web developer focused on frontend technologies."},
+{pattern:/software engineer/i,reply:"His goal is to become a software engineer in a top product-based company."},
+{pattern:/competitive programming/i,reply:"He plans to improve his competitive programming skills."},
+{pattern:/leetcode/i,reply:"He practices coding problems to improve problem-solving."},
+{pattern:/codeforces/i,reply:"He plans to participate in coding contests."},
+{pattern:/hackerrank/i,reply:"Online coding platforms help him improve his programming skills."},
+{pattern:/debug/i,reply:"Debugging is an important part of software development."},
+{pattern:/bug/i,reply:"Every developer encounters bugs—solving them is part of learning."},
+
+// ================= WEB =================
+{pattern:/landing page/,reply:"Yes, Pranav can build responsive landing pages."},
+{pattern:/responsive website/,reply:"Responsive design is one of his priorities."},
+{pattern:/portfolio website/,reply:"He creates modern portfolio websites."},
+{pattern:/business website/,reply:"Business websites are part of his learning projects."},
+{pattern:/blog website/,reply:"He can develop blog-style websites."},
+{pattern:/dashboard/,reply:"Dashboard UI development is part of his roadmap."},
+{pattern:/admin panel/,reply:"Admin panel development is a future goal."},
+{pattern:/ecommerce/,reply:"He plans to build e-commerce projects."},
+{pattern:/ui/,reply:"He enjoys designing clean and modern user interfaces."},
+{pattern:/ux/,reply:"He values user-friendly experiences."},
+
+// ================= AI =================
+{pattern:/artificial intelligence/,reply:"Artificial Intelligence is one of the technologies Pranav wants to explore."},
+{pattern:/machine learning/,reply:"Machine Learning is part of his future learning roadmap."},
+{pattern:/deep learning/,reply:"Deep Learning is a future area of interest."},
+{pattern:/chatgpt/,reply:"This chatbot is inspired by modern conversational AI."},
+{pattern:/openai/,reply:"OpenAI's advancements inspire many AI developers."},
+{pattern:/llm/,reply:"Large Language Models are changing how software is built."},
+{pattern:/ai future/,reply:"AI will play an important role in future software development."},
+{pattern:/prompt engineering/,reply:"Prompt engineering is becoming an important AI skill."},
+
+// ================= GITHUB =================
+{pattern:/repository|repo/,reply:"You can explore Pranav's repositories on GitHub."},
+{pattern:/commit/,reply:"Git commits help track code changes."},
+{pattern:/branch/,reply:"Git branches allow developers to work safely on new features."},
+{pattern:/merge/,reply:"Merging combines completed work into the main project."},
+{pattern:/pull request|pr/,reply:"Pull requests are used for reviewing code before merging."},
+{pattern:/fork/,reply:"Forking creates a personal copy of a repository."},
+{pattern:/clone/,reply:"Git clone downloads a project to your computer."},
+{pattern:/version control/,reply:"Git is Pranav's preferred version control system."},
+
+// ================= CAREER =================
+{pattern:/career/,reply:"Pranav is building a career in software engineering."},
+{pattern:/resume|cv/,reply:"A professional resume will be available soon."},
+{pattern:/intern/,reply:"He is looking forward to internship opportunities."},
+{pattern:/placement/,reply:"He aims for placements in top technology companies."},
+{pattern:/google/,reply:"Working at companies like Google is one of his aspirations."},
+{pattern:/microsoft/,reply:"Microsoft is among the companies he admires."},
+{pattern:/amazon/,reply:"Amazon is a leading product-based company he follows."},
+{pattern:/meta/,reply:"Meta is one of the world's top technology companies."},
+{pattern:/apple/,reply:"Apple inspires developers through innovation."},
+{pattern:/open source/,reply:"Pranav plans to contribute to open-source projects."},
+
+// ================= CONTACT =================
+{pattern:/email address/,reply:"Email: pranavpatil71025@gmail.com"},
+{pattern:/contact number/,reply:"Please use the contact section for communication."},
+{pattern:/hire developer/,reply:"Feel free to contact Pranav through the Contact page."},
+{pattern:/business enquiry/,reply:"Business enquiries are welcome via email."},
+{pattern:/collaboration/,reply:"Pranav is open to collaboration opportunities."},
+{pattern:/remote work/,reply:"Remote collaboration is possible depending on the project."},
+{pattern:/availability/,reply:"Please contact Pranav for availability details."},
+
+// ================= WEBSITE =================
+{pattern:/portfolio design/,reply:"This portfolio is designed with a modern AI-inspired interface."},
+{pattern:/dark theme/,reply:"The website supports a modern dark theme."},
+{pattern:/mobile view/,reply:"The website is optimized for mobile devices."},
+{pattern:/desktop/,reply:"The portfolio works well on desktop screens."},
+{pattern:/animation/,reply:"Smooth animations improve the user experience."},
+{pattern:/performance/,reply:"Performance optimization is an important part of web development."},
+{pattern:/seo/,reply:"SEO helps websites rank higher in search engines."},
+{pattern:/hosting/,reply:"The portfolio is hosted online for easy access."},
+{pattern:/domain/,reply:"A custom domain may be added in the future."},
+{pattern:/github pages/,reply:"GitHub Pages is commonly used for hosting portfolio websites."},
+
+// ================= GENERAL =================
+{pattern:/hello ai/,reply:"Hello! 👋 I'm Pranav's AI Assistant."},
+{pattern:/good job/,reply:"Thank you! 😊"},
+{pattern:/awesome/,reply:"Glad you liked it!"},
+{pattern:/cool/,reply:"😄 Thanks!"},
+{pattern:/nice/,reply:"Thank you!"},
+{pattern:/wow/,reply:"😊"},
+{pattern:/amazing/,reply:"Happy to hear that!"},
+{pattern:/who built this website/,reply:"This website was designed and developed by Pranav."},
+{pattern:/can i ask anything/,reply:"Of course! Ask anything related to Pranav, his skills, projects, or career."},
+{pattern:/what should i ask/,reply:"Try asking about skills, projects, education, technologies, goals, or contact information."},
+{pattern:/what is your name/,reply:"I’m Pranav’s AI assistant."},
+{pattern:/where is he from/,reply:"Pranav is from Talkheda, Maharashtra, India."},
+{pattern:/what is his age/,reply:"Pranav is 17 years old."},
+{pattern:/what are his goals/,reply:"He wants to become a software engineer and grow as a developer."},
+{pattern:/what does he study/,reply:"He is preparing for JEE while building programming and web development skills."},
+{pattern:/does he know html/,reply:"Yes, he works with HTML and other frontend technologies."},
+{pattern:/does he know css/,reply:"Yes, he uses CSS to build modern responsive designs."},
+{pattern:/does he know javascript/,reply:"Yes, JavaScript is one of his main skills."},
+{pattern:/does he know c\+\+/,reply:"Yes, he learns C++ for DSA and programming practice."},
+{pattern:/can he make a website/,reply:"Yes, he can build modern responsive websites and portfolios."},
+{pattern:/is he available for work/,reply:"Yes, he is open to web development and collaboration opportunities."},
+{pattern:/how can i contact him/,reply:"You can contact him through the Contact section or email him at pranavpatil71025@gmail.com."},
+{pattern:/what is his email/,reply:"His email is pranavpatil71025@gmail.com."},
+{pattern:/show me projects/,reply:"Check the Projects section on this website to see his work."},
+{pattern:/what is his hobby/,reply:"He enjoys coding, learning new technologies, and building projects."},
+{pattern:/is he good at coding/,reply:"Yes, he is passionate about coding and continuously improving."},
+{pattern:/does he use github/,reply:"Yes, he uses Git and GitHub for version control and projects."},
+{pattern:/is he learning ai/,reply:"Yes, he is interested in AI and modern web technologies."},
+{pattern:/what is his future plan/,reply:"He wants to become a software engineer and grow in full-stack and AI development."},
+{pattern:/why did you start coding/,reply:"Pranav started coding because he enjoys solving problems and building useful software."},
+{pattern:/what are your strengths/,reply:"Pranav's strengths include consistency, curiosity, problem-solving, and a passion for learning."},
+{pattern:/what motivates you/,reply:"Pranav is motivated by learning new technologies and building real-world projects."},
+{pattern:/what are you working on/,reply:"Pranav is currently improving his AI portfolio, building new projects, and expanding his web development skills."},
+{pattern:/what are your future goals/,reply:"Pranav aims to become a skilled Software Engineer and contribute to impactful software products."},
+{pattern:/why should i hire you/,reply:"Pranav is a dedicated learner who enjoys solving problems, building modern web applications, and continuously improving his skills."},
+{pattern:/can i contact you/,reply:"Yes. Visitors can contact Pranav through the Contact section or his social media profiles."},
+{pattern:/what technologies do you know/,reply:"Pranav works with HTML, CSS, JavaScript, C, C++, Git, and GitHub, and is continuously learning new technologies."},
+{pattern:/what projects have you built/,reply:"Pranav has built portfolio websites, AI chatbot interfaces, and several web development projects."},
+{pattern:/who made this website/,reply:"This website was designed and developed by Pranav."},
 ];
 
 function getMockReply(text){
   const normalized = text.toLowerCase();
   for(const item of cannedReplies){
-    if(item.pattern.test(normalized)) return item.reply;
+    const pattern = item.pattern;
+    const matches = pattern instanceof RegExp
+      ? pattern.test(normalized)
+      : normalized.includes(String(pattern).toLowerCase());
+    if(matches) return item.reply;
   }
-  return "I’m here to help with questions about Pranav’s skills, background, and contact details.";
+  return "Sorry, I don't have information about that yet. Try asking about Pranav's skills, projects, education, experience, technologies, or contact details.";
 }
 
 async function sendMessage(){
@@ -871,6 +1261,10 @@ sendBtn.addEventListener('click', sendMessage);
 chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
 
 chatLauncher.addEventListener('click', () => {
+  if(launcherMoved){
+    launcherMoved = false;
+    return;
+  }
   chatWidget.style.display = 'flex';
   chatWidget.classList.add('open');
   chatLauncher.style.display = 'none';
@@ -878,6 +1272,50 @@ chatLauncher.addEventListener('click', () => {
   if(chatBody.children.length === 0){
     addMessage('bot', formatBotText("Hi! I'm Pranav's AI Assistant 🤖\nWelcome! Ask me anything about Pranav's skills, projects, or contact details."));
   }
+});
+openEnquiry.addEventListener('click', () => {
+  enquiryModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+});
+closeEnquiry.addEventListener('click', () => {
+  enquiryModal.classList.remove('active');
+  document.body.style.overflow = '';
+});
+enquiryModal.addEventListener('click', (e) => {
+  if(e.target === enquiryModal){
+    enquiryModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+});
+submitEnquiry.addEventListener('click', () => {
+  const fullName = fullNameInput.value.trim();
+  const mobile = mobileInput.value.trim();
+  if(!fullName || !mobile){
+    alert('Please enter both your full name and mobile number.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('name', fullName);
+  formData.append('mobile', mobile);
+  formData.append('_subject', 'New Enquiry from Portfolio Website');
+  formData.append('_captcha', 'false');
+  formData.append('_template', 'table');
+
+  fetch('https://formsubmit.co/ajax/pranavpatil71025@gmail.com', {
+    method: 'POST',
+    body: formData
+  })
+  .then(() => {
+    enquiryModal.classList.remove('active');
+    document.body.style.overflow = '';
+    fullNameInput.value = '';
+    mobileInput.value = '';
+    alert('Thanks! Your enquiry has been sent.');
+  })
+  .catch(() => {
+    alert('There was a problem sending your enquiry. Please try again later.');
+  });
 });
 minimizeChat.addEventListener('click', () => {
   chatWidget.style.display = 'none';
@@ -898,8 +1336,17 @@ const chatHeader = document.querySelector('.chat-header');
 if(chatHeader){
   chatHeader.addEventListener('pointerdown', onDragStart);
 }
-document.addEventListener('pointermove', onDragMove);
-document.addEventListener('pointerup', onDragEnd);
+if(chatLauncher){
+  chatLauncher.addEventListener('pointerdown', onLauncherDragStart);
+}
+document.addEventListener('pointermove', (e) => {
+  onDragMove(e);
+  onLauncherDragMove(e);
+});
+document.addEventListener('pointerup', () => {
+  onDragEnd();
+  onLauncherDragEnd();
+});
 
 // nav active state on scroll (simple)
 const navLinks = document.querySelectorAll('nav a');
