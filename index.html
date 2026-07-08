@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Pranav Patil — Aspiring Software Engineer</title>
+<title>Pranav Patil — Pranav AI is here to help</title>
 <style>
   :root{
     --bg:#07080d;
@@ -89,7 +89,7 @@
     border-radius:18px;
     padding:24px;
     position:relative;
-    box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    box-shadow:0 20px 60px rgba(43, 0, 0, 0.45);
   }
   .enquiry-close{
     position:absolute;
@@ -107,7 +107,7 @@
   .enquiry-card p{color:var(--muted); margin-bottom:18px; font-size:0.95rem;}
   .enquiry-card label{display:block; margin-bottom:8px; font-weight:600; font-size:0.95rem;}
   .enquiry-card input{
-    width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--line); background:#0d0f18; color:var(--text); margin-bottom:14px; outline:none; font-size:1rem;
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--line); background:#1d223b; color:var(--text); margin-bottom:14px; outline:none; font-size:1rem;
   }
   @media (max-width: 600px){
     .enquiry-card{padding:20px;}
@@ -314,21 +314,33 @@
 
   /* Chat widget */
   .chat-widget{
-    position:fixed;
-    bottom:18px; right:18px;
-    width:min(96vw,360px);
-    max-width:360px;
-    height:min(88vh,700px);
-    max-height:88vh;
-    background:linear-gradient(180deg, rgba(9,12,22,0.98), rgba(15,18,31,0.98));
-    border:none;
-    border-radius:32px;
-    display:flex; flex-direction:column;
-    box-shadow:0 26px 80px rgba(35,53,115,0.45);
-    z-index:100;
+     position:fixed;
+    inset:20px;
+    width: calc(100vw - 40px);
+height: calc(100vh - 40px);
+    display:flex;
+    flex-direction:column;
+    background:#0d111c;
+    border-radius:26px;
+    border:1px solid rgba(255,255,255,.08);
     overflow:hidden;
-    touch-action:none;
+    z-index:99999;
+    box-shadow:0 25px 80px rgba(0,0,0,.55);
   }
+  .chat-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    backdrop-filter:blur(8px);
+    opacity:0;
+    visibility:hidden;
+    transition:.3s;
+    z-index:99998;
+}
+.chat-overlay.active{
+    opacity:1;
+    visibility:visible;
+}
   .chat-widget::before{
     content:"";
     position:absolute;
@@ -354,16 +366,18 @@
     to{opacity:1; transform:translateY(0) scale(1);}
   }
   .chat-header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 20px 14px;
-    background:rgba(12,15,26,0.88);
-    backdrop-filter:blur(18px);
-    transition:background .2s, border-color .2s, transform .2s;
-    cursor:grab;
-    user-select:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 20px;
+    background:#111827;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    flex-shrink:0;
   }
-  .chat-header:hover{transform:translateY(-1px);}
-  .chat-header-left{display:flex; align-items:center; gap:14px;}
+  .chat-header:hover{transform:translateY(-1px);
+  }
+  .chat-header-left{display:flex; align-items:center; gap:12px;
+  }
   .bot-icon{
     width:52px; height:52px;
     border-radius:18px;
@@ -378,7 +392,7 @@
   .chat-status::before{content:""; width:8px; height:8px; border-radius:50%; background:#4ade80;}
   .chat-status.typing{color:#facc15;}
   .chat-status.typing::before{background:#facc15;}
-  .chat-header-right{display:flex; gap:10px; color:var(--muted); font-size:1.05rem;}
+  .chat-header-right{display:flex; align-items:center; gap:14px;}
   .chat-header-right span{cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:12px; background:rgba(255,255,255,0.04);}
   .chat-header-right span:hover{color:#fff; background:rgba(255,255,255,0.1);}
   .chat-widget.open .chat-header{
@@ -405,12 +419,11 @@
   .chat-body{
     flex:1;
     overflow-y:auto;
-    padding:18px;
-    display:flex; flex-direction:column;
-    gap:14px;
-    min-height:200px;
-    max-height:420px;
-    background:radial-gradient(circle at top right, rgba(91,108,255,0.08), transparent 32%);
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    background:#0f131d;
   }
   .chat-body::-webkit-scrollbar{width:6px;}
   .chat-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12); border-radius:3px;}
@@ -602,9 +615,76 @@
   @media (prefers-reduced-motion: reduce){
     .avatar-ring{animation:none;}
   }
+  #loader{
+    position:fixed;
+    inset:0;
+    background:#05060f;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:999999;
+}
+
+.spinner{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:4px solid transparent;
+    border-top:4px solid #00f7ff;
+    border-right:4px solid #8b5cf6;
+    border-bottom:4px solid #ff4d6d;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+
+#loader h2{
+    color:white;
+    margin-top:20px;
+}
+
+#loader p{
+    color:#aaa;
+}
+.message-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.msg-action{
+    background:transparent;
+    border:none;
+    color:#9ca3af;
+    cursor:pointer;
+    font-size:13px;
+    transition:.25s;
+}
+
+.msg-action:hover{
+    color:#6C63FF;
+}
+
+.message-time{
+    margin-top:8px;
+    font-size:11px;
+    color:#777;
+}
 </style>
 </head>
-<body>
+
+  <body>
+
+<div id="loader">
+    <div class="spinner"></div>
+    <h2>Pranav AI</h2>
+    <p>Loading Portfolio...</p>
+</div>
 
 <header>
   <div class="logo">Pranav <span>Patil</span></div>
@@ -629,7 +709,8 @@
         <h1>Pranav Patil</h1>
         <div class="role">Aspiring Software Engineer</div>
       </div>
-      <p class="tagline">Hi, I'm Pranav Ganesh Patil, an aspiring Software Engineer and passionate Web Developer from Maharashtra, India. I enjoy building modern, responsive websites and continuously learning new technologies. I'm currently strengthening my skills in HTML, CSS, JavaScript, C, C++, Git, and GitHub while working toward becoming a Full-Stack Developer. This portfolio showcases my projects, skills, and learning journey.</p>
+      <p class="tagline">Hi, I'm Pranav Ganesh Patil, an aspiring Software Engineer and passionate Web Developer from Maharashtra, India. I enjoy building modern, responsive websites and continuously learning new technologies.and I created a AI that can help you with your queries. I hope you will find it useful! Thanks For Visiting!🙏 Have a Nice Day!😊</p>
+      <h3>You can check out my social profiles just click on the icons below!</h3>
       <div class="socials">
         <a href="https://github.com/pranavpatil71022-lgtm" aria-label="GitHub" target="_blank" rel="noopener noreferrer">🐙</a>
         <a href="https://www.linkedin.com/in/pranav-g-patil-6230aa365?utm_source=share_via&utm_content=profile&utm_medium=member_android" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">in</a>
@@ -739,7 +820,7 @@
   </section>
 </main>
 
-<footer>© 2026 Pranav Patil. Built with plain HTML, CSS & JavaScript.</footer>
+<footer>© 2026 Pranav Patil. Built with plain HTML, CSS & JavaScript. All rights reserved.</footer>
 
 <div class="enquiry-modal" id="enquiryModal">
   <div class="enquiry-card">
@@ -750,23 +831,81 @@
     <input id="fullName" name="name" type="text" placeholder="Enter your full name">
     <label for="mobileNumber">Mobile Number</label>
     <input id="mobileNumber" name="mobile" type="tel" placeholder="Enter your mobile number">
+    <label for="Email">Email</label>
+    <input id="Email" name="email" type="email" placeholder="Enter your email(optional)">
     <button class="enquiry-submit" id="submitEnquiry" type="button">Submit</button>
   </div>
 </div>
 
 <button class="chat-launcher" id="chatLauncher" aria-label="Open AI assistant">
-  <span class="launcher-label">Ask to Pranav's AI</span>
-  <span class="launcher-icon">🤖</span>
+  <span class="launcher-label">Chat with Pranav AI😊</span>
+  <svg width="110" height="110" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Shadow -->
+  <ellipse cx="110" cy="195" rx="55" ry="10" fill="#d9d9d9"/>
+
+  <!-- Head -->
+  <rect x="65" y="20" width="90" height="70" rx="18" fill="#4F8EF7"/>
+
+  <!-- Antennas -->
+  <line x1="85" y1="20" x2="80" y2="5" stroke="#444" stroke-width="3"/>
+  <circle cx="80" cy="5" r="4" fill="#7B61FF"/>
+
+  <line x1="135" y1="20" x2="140" y2="5" stroke="#444" stroke-width="3"/>
+  <circle cx="140" cy="5" r="4" fill="#7B61FF"/>
+
+  <!-- Eyes -->
+  <circle cx="90" cy="50" r="12" fill="white"/>
+  <circle cx="130" cy="50" r="12" fill="white"/>
+  <circle cx="90" cy="50" r="5" fill="#222"/>
+  <circle cx="130" cy="50" r="5" fill="#222"/>
+
+  <!-- Smile -->
+  <path d="M90 70 Q110 85 130 70" stroke="#222" stroke-width="3" fill="none"/>
+
+  <!-- Body -->
+  <rect x="75" y="95" width="70" height="70" rx="15" fill="#5DA9FF"/>
+
+  <!-- Screen -->
+  <rect x="90" y="110" width="40" height="25" rx="6" fill="#7B61FF"/>
+  <text x="110" y="127" text-anchor="middle" fill="white" font-size="13" font-family="Arial">AI</text>
+
+  <!-- Arms -->
+  <line x1="75" y1="115" x2="45" y2="95" stroke="#5DA9FF" stroke-width="8"/>
+  <line x1="145" y1="115" x2="175" y2="90" stroke="#5DA9FF" stroke-width="8"/>
+
+  <!-- Hands -->
+  <circle cx="42" cy="92" r="6" fill="#7B61FF"/>
+  <circle cx="178" cy="87" r="6" fill="#7B61FF"/>
+
+  <!-- Legs -->
+  <line x1="90" y1="165" x2="80" y2="190" stroke="#5DA9FF" stroke-width="8"/>
+  <line x1="130" y1="165" x2="140" y2="190" stroke="#5DA9FF" stroke-width="8"/>
+
+  <!-- Feet -->
+  <ellipse cx="78" cy="194" rx="10" ry="5" fill="#7B61FF"/>
+  <ellipse cx="142" cy="194" rx="10" ry="5" fill="#7B61FF"/>
+
+  <!-- Chat Bubble -->
+  <rect x="155" y="30" width="45" height="30" rx="8" fill="#7B61FF"/>
+  <polygon points="165,60 170,68 178,60" fill="#7B61FF"/>
+  <circle cx="168" cy="45" r="2.5" fill="white"/>
+  <circle cx="178" cy="45" r="2.5" fill="white"/>
+  <circle cx="188" cy="45" r="2.5" fill="white"/>
+
+</svg>
 </button>
 
+<div class="chat-overlay" id="chatOverlay"></div>
 <div class="chat-widget" id="chatWidget" style="display:none;">
   <div class="chat-header">
     <div class="chat-header-left">
       <div class="bot-icon">🤖</div>
       <div>
-        <div class="chat-title">AI Assistant</div>
-        <div class="chat-subtitle">Helpful answers about Pranav</div>
+        <div class="chat-title">Pranav AI</div>
+        <div class="chat-subtitle">Ask anything about Pranav</div>
         <div class="chat-status">Online</div>
+        <div class="chat-status typing" style="display:none;">Pranav AI is thinking...</div>
       </div>
     </div>
     <div class="chat-header-right">
@@ -775,11 +914,13 @@
       <span id="closeChat" title="Close">✕</span>
     </div>
   </div>
-  <div class="chat-body" id="chatBody"></div>
-  <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="Type your message...">
+    <div class="chat-body" id="chatBody"></div>
+
+<div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Ask Pranav AI anything...">
     <button class="send-btn" id="sendBtn">➤</button>
-  </div>
+</div>
+
 </div>
 
 <script>
@@ -788,12 +929,12 @@ const SYSTEM_PROMPT = `You are Pranav Patil's AI Assistant on his personal portf
 Facts about Pranav:
 - 17-year-old aspiring software engineer, currently preparing for JEE (Indian engineering entrance exam)
 - Skills: HTML, CSS, JavaScript, C, C++, Data Structures & Algorithms, Git & GitHub, Problem Solving
-- Journey: Started coding in 2023, built his first website in 2024, strengthened DSA and projects in 2025, and is working toward becoming a Software Engineer in 2026
+- Journey: Started coding in 2025, built his first website in 2025, strengthened DSA and projects in 2026, and is working toward becoming a Software Engineer in 2027
 - He builds modern, responsive websites and enjoys turning ideas into real projects
 - Contact: via the Contact section on this site, or email at pranavpatil71025@gmail.com
 - He has GitHub, LinkedIn, and Instagram profiles linked on the site
 
-Only answer questions about Pranav, his skills, background, and how to contact him. If asked something unrelated, gently steer back to being his portfolio assistant. Keep replies short and readable on a small chat widget.`;
+Only answer questions about Pranav, his skills, background, and how to contact him. If asked something unrelated, gently steer back to being his portfolio assistant.`;
 
 const chatBody = document.getElementById('chatBody');
 const chatInput = document.getElementById('chatInput');
@@ -802,6 +943,7 @@ const chatWidget = document.getElementById('chatWidget');
 const chatLauncher = document.getElementById('chatLauncher');
 const closeChat = document.getElementById('closeChat');
 const minimizeChat = document.getElementById('minimizeChat');
+const chatOverlay = document.getElementById("chatOverlay");
 const resetChat = document.getElementById('resetChat');
 const openEnquiry = document.getElementById('openEnquiry');
 const enquiryModal = document.getElementById('enquiryModal');
@@ -809,20 +951,117 @@ const closeEnquiry = document.getElementById('closeEnquiry');
 const submitEnquiry = document.getElementById('submitEnquiry');
 const fullNameInput = document.getElementById('fullName');
 const mobileInput = document.getElementById('mobileNumber');
-
+const emailInput = document.getElementById('Email');
 let history = [];
+let lastUserMessage = "";
 
 function addMessage(role, html){
   const row = document.createElement('div');
   row.className = 'msg-row ' + (role === 'user' ? 'user' : 'bot');
-  row.innerHTML = `
-    <div class="msg-avatar">${role === 'user' ? '🙂' : '🤖'}</div>
-    <div class="msg-bubble">${html}</div>
-  `;
+ const time = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+});
+
+row.innerHTML = `
+<div class="msg-avatar">${role === 'user' ? '😊' : '🤖'}</div>
+<div class="msg-bubble">
+    <div class="message-content">
+        ${html}
+    </div>
+    ${
+        role === "bot"
+        ? `
+        <div class="message-actions">
+            <button class="msg-action copy-btn">📋 Copy</button>
+            <button class="msg-action like-btn">👍</button>
+            <button class="msg-action dislike-btn">👎</button>
+            <button class="msg-action retry-btn">🔄 Retry</button>
+            <button class="msg-action share-btn">📤 Share</button>
+        </div>
+        `
+        : ""
+    }
+    <div class="message-time">${time}</div>
+
+</div>
+`;
   chatBody.appendChild(row);
   chatBody.scrollTop = chatBody.scrollHeight;
+  localStorage.setItem("chatHistory", chatBody.innerHTML);
   return row;
 }
+document.addEventListener("click", (e) =>{
+
+    // Copy
+    if (e.target.classList.contains("copy-btn")) {
+
+        const text = e.target
+            .closest(".msg-bubble")
+            .querySelector(".message-content")
+            .innerText;
+
+        navigator.clipboard.writeText(text);
+
+        e.target.textContent = "✅ Copied";
+
+        setTimeout(() => {
+            e.target.textContent = "📋 Copy";
+        }, 1200);
+    }
+
+    // Like
+    if (e.target.classList.contains("like-btn")) {
+
+        e.target.textContent = "💜 Liked";
+
+        setTimeout(() => {
+            e.target.textContent = "👍";
+        }, 1200);
+    }
+
+    // Dislike
+    if (e.target.classList.contains("dislike-btn")) {
+
+        e.target.textContent = "👎 Noted";
+
+        setTimeout(() => {
+            e.target.textContent = "👎";
+        }, 1200);
+    }
+
+    // Share
+    if (e.target.classList.contains("share-btn")) {
+
+        const text = e.target
+            .closest(".msg-bubble")
+            .querySelector(".message-content")
+            .innerText;
+
+        if (navigator.share) {
+
+            navigator.share({
+                title: "Pranav AI",
+                text: text
+            });
+
+        } else {
+
+            navigator.clipboard.writeText(text);
+
+            alert("Message copied. You can now share it.");
+
+        }
+    }
+    if (e.target.classList.contains("retry-btn")) {
+
+    if (!lastUserMessage) return;
+
+    chatInput.value = lastUserMessage;
+    sendBtn.click();
+
+}
+});
 
 function setChatStatus(text, typing = false){
   const status = document.querySelector('.chat-status');
@@ -832,7 +1071,7 @@ function setChatStatus(text, typing = false){
 }
 
 function addTyping(){
-  setChatStatus('Typing...', true);
+  setChatStatus('Pranav AI is thinking...', true);
   const row = document.createElement('div');
   row.className = 'msg-row bot';
   row.id = 'typingRow';
@@ -908,22 +1147,24 @@ function onLauncherDragStart(e){
 }
 
 function onLauncherDragMove(e){
-  if(!isLauncherDragging) return;
-  const dx = e.clientX - launcherDragStartX;
-  const dy = e.clientY - launcherDragStartY;
-  if(Math.abs(dx) + Math.abs(dy) > 3) launcherMoved = true;
-  const nextLeft = Math.min(Math.max(launcherStartLeft + dx, 12), window.innerWidth - chatLauncher.offsetWidth - 12);
-  const nextTop = Math.min(Math.max(launcherStartTop + dy, 12), window.innerHeight - chatLauncher.offsetHeight - 12);
-  chatLauncher.style.left = `${nextLeft}px`;
-  chatLauncher.style.top = `${nextTop}px`;
+    if(!isLauncherDragging) return;
+    const dx = e.clientX - launcherDragStartX;
+    const dy = e.clientY - launcherDragStartY; // Fixed typo here
+    if(Math.abs(dx) + Math.abs(dy) > 10) {
+        launcherMoved = true;
+    }
+    const nextLeft = Math.min(Math.max(launcherStartLeft + dx, 12), window.innerWidth - chatLauncher.offsetWidth - 12);
+    const nextTop = Math.min(Math.max(launcherStartTop + dy, 12), window.innerHeight - chatLauncher.offsetHeight - 12);
+    chatLauncher.style.left = `${nextLeft}px`;
+    chatLauncher.style.top = `${nextTop}px`;
 }
-
 function onLauncherDragEnd(){
-  if(!isLauncherDragging) return;
-  isLauncherDragging = false;
-  chatLauncher.classList.remove('dragging');
+ if(!isLauncherDragging) return;
+    isLauncherDragging = false;
+    chatLauncher.classList.remove('dragging');
+    // This tiny timeout cleanly resets the state right after your click finishes
+    setTimeout(() => { launcherMoved = false; }, 50);
 }
-
 function escapeHtml(str){
   const div = document.createElement('div');
   div.textContent = str;
@@ -964,21 +1205,21 @@ const cannedReplies = [
   {pattern: /bye|goodbye|see you/, reply: "Goodbye! If you have more questions about Pranav, just come back and ask!"},
   {pattern: /village|hometown|from|belong/, reply: "Pranav is from Talkheda Maharashtra, India."},
   {pattern: /jee|exam|preparing/, reply: "Pranav is currently preparing for the JEE (Indian engineering entrance exam) while building his coding skills and projects."},
-  {pattern: /meeting|call|schedule|meet/, reply: " For meetings or calls, please reach out via the Contact section or email. I cant schedule meetings or calls."},
+  {pattern: /meeting|call|schedule|meet/, reply: " For meetings or calls, please reach out via the Contact section or email.you can also submit Enquiry and then he will get back to you. I cant schedule meetings or calls."},
   {pattern: /located/, reply: "Pranav is based in Talkheda In Jalgaon District, Maharashtra, India."},
   {pattern: /नाव|तुम कोण आहात|प्रणव कोण आहे/, reply: "मी प्रणवचा AI सहाय्यक आहे. त्याच्या कौशल्यांबद्दल, प्रकल्पांबद्दल किंवा संपर्क माहितीसंबंधी प्रश्न विचारा."},
   {pattern: /कौशल्य|तंत्रज्ञान|स्टॅक|टेक/, reply: "प्रणव HTML, CSS, JavaScript, C, C++, डेटा स्ट्रक्चर्स, अल्गोरिदम, Git/GitHub आणि प्रतिसादात्मक वेब डिझाइनसह काम करतो."},
-  {pattern: /प्रकल्प|वेबसाइट|पोर्टफोलिओ/, reply: "तो आधुनिक, प्रतिसादात्मक वेबसाइट तयार करतो आणि वास्तविक प्रकल्पांसह त्याचे पोर्टफोलिओ वाढवत आहे."},
-  {pattern: /संपर्क|ईमेल|पहुंच/, reply: "आपण संपर्क विभागाद्वारे किंवा ईमेलद्वारे प्रणवशी संपर्क साधू शकता."},
+  {pattern: /प्रकल्प|वेबसाइट|पोरटफोलिओ/, reply: "तो आधुनिक, प्रतिसादात्मक वेबसाइट तयार करतो आणि वास्तविक प्रकल्पांसह त्याचे पोर्टफोलिओ वाढवत आहे."},
+  {pattern: /संपर्क|ईमेल|चौकशी/, reply: "आपण संपर्क विभागाद्वारे किंवा ईमेलद्वारे प्रणवशी संपर्क साधू शकता. नाहीतर तुम्ही चौकशी अर्ज(Enquiry Form) सबमिट करू शकता आणि नंतर तो तुम्हाला संपर्क साधेल."},
   {pattern: /यात्रा|पार्श्वभूमी|अनुभव/, reply: "प्रणवने 2025 मध्ये कोडिंग सुरू केली, 2026 मध्ये त्याची पहिली वेबसाइट तयार केली आणि सध्या DSA शिकत आहे आणि प्रकल्प तयार करत आहे."},
   {pattern: /वय|किती वर्षे/, reply: "प्रणव 17 वर्षांचा आहे आणि तो JEE साठी तयारी करणारा एक महत्वाकांक्षी सॉफ्टवेअर अभियंता आहे."},
-  {pattern: /nav|kon ahe tumhi|pranav kon ahe/, reply: "Mi Pranav cha AI sahayyak aahe.Pranav Aspiring Software Engineer aahe." },
+  {pattern: /लिंक्डइन|गिटहब|इंस्टाग्राम/, reply: "आपण प्रणवला GitHub, LinkedIn आणि Instagram वर शोधू शकता, त्याच्या वेबसाइटवरील सामाजिक दुव्यांद्वारे."},
   {pattern: /kaushalya|tantradyan|stack|tech/, reply: "Pranav HTML, CSS, JavaScript, C, C++, data structures, algorithms, Git/GitHub, ani responsive web design sobat kam karto."},
   {pattern: /prakalp|website|portfolio/, reply: "To aadunik, responsive websites tayar karto ani vastavik prakalpan sobat tyache portfolio vadhavto aahe."},
-  {pattern: /sampark|email|pahunch/, reply: "Aapan sampark vibhag dwara kiva email dwara Pranav sobat sampark sadhoo shakta."},
+  {pattern: /sampark|email|pahunch/, reply: "Aapan sampark vibhag dwara kiva email dwara Pranav sobat sampark sadhoo shakta. nahitr tumhi chaukashi arj(Enquiry Form) submit karu shakta ani nantar to tumhala sampark sadel."},
   {pattern: /pravas|parshvabhoomi|anubhav|kam kay krto/, reply: "Pranavne 2025 madhe coding suru keli, 2026 madhe tyachi pahili website sobat swatacha AI Assistant tayar kela ani sadhya DSA shikat aahe ani prakalp tayar kart aahe."},
   {pattern: /vay|kiti varsha|pranav che vay/, reply: "Pranav 17 varshacha aahe ani to JEE sathi tayyari karanara ek ichhuk software engineer aahe."},
-  {pattern: /to kuthe rahto|kuthun aahe|kuthlya gavat aahe|pranav kontya gavcha ahe|kuthun ahe|kontya gavcha ahe|rahato/, reply: "Pranav Talkheda, Maharashtra, India madhe rahato."},
+  {pattern: /kuthe|kuthun aahe|kuthlya gavat|gavcha|kuthun|rahato/, reply: "Pranav Talkheda, Maharashtra, India madhe rahato."},
   // ================= ABOUT =================
 {pattern: /name|full name|what is your name/, reply: "His full name is Pranav Ganesh Patil."},
 {pattern: /nickname|nick name/, reply: "Most people call him Pannu."},
@@ -1095,7 +1336,7 @@ const cannedReplies = [
 {pattern:/brother/i,reply:"Pranav has a brother Aditya Patil."},
 {pattern:/sister/i,reply:"Information about siblings isn't publicly listed."},
 {pattern:/Friend/i,reply:"He have a friend name Om Gavale and more would be."},
-{pattern:/married|wife|girlfriend/i,reply:"Pranav is currently focused on studies and software development."},
+{pattern:/married|wife|girlfriend|Gf|gf/i,reply:"Pranav is currently focused on studies and software development."},
 {pattern:/relationship/i,reply:"Personal relationship information isn't available."},
 {pattern:/height/i,reply:"Height information isn't available."},
 {pattern:/weight/i,reply:"Weight information isn't available."},
@@ -1147,7 +1388,7 @@ const cannedReplies = [
 {pattern:/commit/,reply:"Git commits help track code changes."},
 {pattern:/branch/,reply:"Git branches allow developers to work safely on new features."},
 {pattern:/merge/,reply:"Merging combines completed work into the main project."},
-{pattern:/pull request|pr/,reply:"Pull requests are used for reviewing code before merging."},
+{pattern:/pull request/,reply:"Pull requests are used for reviewing code before merging."},
 {pattern:/fork/,reply:"Forking creates a personal copy of a repository."},
 {pattern:/clone/,reply:"Git clone downloads a project to your computer."},
 {pattern:/version control/,reply:"Git is Pranav's preferred version control system."},
@@ -1227,134 +1468,130 @@ const cannedReplies = [
 {pattern:/who made this website/,reply:"This website was designed and developed by Pranav."},
 ];
 
-function getMockReply(text){
+function getMockReply(text) {
   const normalized = text.toLowerCase();
-  for(const item of cannedReplies){
+  for (const item of cannedReplies) {
     const pattern = item.pattern;
     const matches = pattern instanceof RegExp
       ? pattern.test(normalized)
       : normalized.includes(String(pattern).toLowerCase());
-    if(matches) return item.reply;
+    
+    if (matches) return item.reply;
   }
-  return "Sorry, I don't have information about that yet. Try asking about Pranav's skills, projects, education, experience, technologies, or contact details.";
+  return null; // Signals to use the AI API if no canned reply matches
 }
 
-async function sendMessage(){
-  const text = chatInput.value.trim();
-  if(!text) return;
-  addMessage('user', escapeHtml(text));
-  history.push({role:'user', content: text});
+// Function to call your secure Vercel backend
+async function fetchAIReply(userMessage) {
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        message: userMessage,
+        systemPrompt: SYSTEM_PROMPT 
+      })
+    });
+
+    if (response.status === 429) {
+      return "I'm receiving a lot of queries right now! Please wait a moment and try asking again. 🤖";
+    }
+
+    const data = await response.json();
+    return data.reply;
+
+  } catch (error) {
+    console.error("API Error:", error);
+    return "I'm having trouble connecting to my AI brain right now. Try asking something else!";
+  }
+}
+
+// Main function to handle sending messages
+async function handleUserSendMessage() {
+  const messageText = chatInput.value.trim();
+  if (!messageText) return;
+
+  // Clear input and display user message in the UI
   chatInput.value = '';
-  sendBtn.disabled = true;
-  addTyping();
+  addMessage('user', escapeHtml(messageText));
+  lastUserMessage = messageText;
 
-  await new Promise(resolve => setTimeout(resolve, 600));
-  removeTyping();
-
-  const replyText = getMockReply(text);
-  addMessage('bot', formatBotText(replyText));
-  history.push({role:'assistant', content: replyText});
-  sendBtn.disabled = false;
+  // Check local canned responses first
+  const localReply = getMockReply(messageText);
+  
+  if (localReply !== null) {
+    addTyping();
+    setTimeout(() => {
+      removeTyping();
+      addMessage('bot', formatBotText(localReply));
+    }, 400);
+  } else {
+    // No match -> hit the AI API backend
+    addTyping();
+    const aiReply = await fetchAIReply(messageText);
+    removeTyping();
+    addMessage('bot', formatBotText(aiReply));
+  }
 }
 
-sendBtn.addEventListener('click', sendMessage);
-chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
-
-chatLauncher.addEventListener('click', () => {
-  if(launcherMoved){
-    launcherMoved = false;
-    return;
-  }
-  chatWidget.style.display = 'flex';
-  chatWidget.classList.add('open');
-  chatLauncher.style.display = 'none';
-  setChatStatus('Online', false);
-  if(chatBody.children.length === 0){
-    addMessage('bot', formatBotText("Hi! I'm Pranav's AI Assistant 🤖\nWelcome! Ask me anything about Pranav's skills, projects, or contact details."));
+// Event listeners for sending messages
+sendBtn.addEventListener('click', handleUserSendMessage);
+chatInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    handleUserSendMessage();
   }
 });
-openEnquiry.addEventListener('click', () => {
-  enquiryModal.classList.add('active');
-  document.body.style.overflow = 'hidden';
-});
-closeEnquiry.addEventListener('click', () => {
-  enquiryModal.classList.remove('active');
-  document.body.style.overflow = '';
-});
-enquiryModal.addEventListener('click', (e) => {
-  if(e.target === enquiryModal){
-    enquiryModal.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-});
-submitEnquiry.addEventListener('click', () => {
-  const fullName = fullNameInput.value.trim();
-  const mobile = mobileInput.value.trim();
-  if(!fullName || !mobile){
-    alert('Please enter both your full name and mobile number.');
-    return;
-  }
 
-  const formData = new FormData();
-  formData.append('name', fullName);
-  formData.append('mobile', mobile);
-  formData.append('_subject', 'New Enquiry from Portfolio Website');
-  formData.append('_captcha', 'false');
-  formData.append('_template', 'table');
+// Window load settings & localStorage setup (from your second screenshot)
 
-  fetch('https://formsubmit.co/ajax/pranavpatil71025@gmail.com', {
-    method: 'POST',
-    body: formData
-  })
-  .then(() => {
-    enquiryModal.classList.remove('active');
-    document.body.style.overflow = '';
-    fullNameInput.value = '';
-    mobileInput.value = '';
-    alert('Thanks! Your enquiry has been sent.');
-  })
-  .catch(() => {
-    alert('There was a problem sending your enquiry. Please try again later.');
-  });
-});
-minimizeChat.addEventListener('click', () => {
-  chatWidget.style.display = 'none';
-  chatLauncher.style.display = 'flex';
-});
-closeChat.addEventListener('click', () => {
-  chatWidget.style.display = 'none';
-  chatWidget.classList.remove('open');
-  chatLauncher.style.display = 'flex';
-});
-resetChat.addEventListener('click', () => {
-  history = [];
-  chatBody.innerHTML = '';
-  addMessage('bot', formatBotText("Hi! I'm Pranav's AI Assistant 🤖\nHow can I help you today?"));
+chatLauncher.addEventListener("click", () => {
+
+    if (launcherMoved) {
+        launcherMoved = false;
+        return;
+    }
+
+    chatWidget.style.display = "flex";
+    chatOverlay.classList.add("active");
+    chatLauncher.style.display = "none";
+
+    chatWidget.classList.add("open");
+    chatWidget.style.opacity = "1";
+    chatWidget.style.transform = "translate(-50%, -50%) scale(1)";
+
+    if (chatBody.children.length === 0) {
+        addMessage(
+            "bot",
+            formatBotText("Hi! I'm Pranav AI 🤖\nHow can I help you today?")
+        );
+    }
+
+}); 
+
+closeChat.addEventListener("click", () => {
+
+    chatWidget.style.display = "none";
+    chatOverlay.classList.remove("active");
+
 });
 
-const chatHeader = document.querySelector('.chat-header');
-if(chatHeader){
-  chatHeader.addEventListener('pointerdown', onDragStart);
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.getElementById("loader").style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById("loader").remove();
+    }, 500);
+  }, 2000);
+});
+
+const savedchat = localStorage.getItem("chatHistory");
+if (savedchat) {
+  chatBody.innerHTML = savedchat;
+  chatBody.scrollTop = chatBody.scrollHeight;
 }
-if(chatLauncher){
-  chatLauncher.addEventListener('pointerdown', onLauncherDragStart);
-}
-document.addEventListener('pointermove', (e) => {
-  onDragMove(e);
-  onLauncherDragMove(e);
-});
-document.addEventListener('pointerup', () => {
-  onDragEnd();
-  onLauncherDragEnd();
-});
 
-// nav active state on scroll (simple)
-const navLinks = document.querySelectorAll('nav a');
-navLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    navLinks.forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
-  });
+chatOverlay.addEventListener("click", () => {
+  closeChat.click();
 });
 </script>
 
