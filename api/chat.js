@@ -24,8 +24,8 @@ export default async function handler(request, response) {
     
     response.status(200).json({ reply: replyText });
 
-  } catch (error) {
-    console.error(error);
-    response.status(500).json({ reply: "Error processing your request." });
-  }
+ } catch (error) {
+  console.error(error);
+  response.status(500).json({ reply: "Error processing your request." });
+}
 }
