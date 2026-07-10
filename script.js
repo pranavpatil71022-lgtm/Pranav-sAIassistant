@@ -432,29 +432,52 @@ function getMockReply(text) {
   const normalized = text.toLowerCase();
   for (const item of cannedReplies) {
     const pattern = item.pattern;
-    const matches = pattern instanceof RegExp
-      ? pattern.test(normalized)
-      : normalized.includes(String(pattern).toLowerCase());
+    let matches = false;
+
+if (pattern instanceof RegExp) {
+    pattern.lastIndex = 0;
+    matches = pattern.test(normalized);
+} else {
+    matches = normalized.includes(String(pattern).toLowerCase());
+}
     
     if (matches) return item.reply;
-  }
+  }}
  
   // Smart Technology Knowledge Base Search
  const message = text.toLowerCase();
 
+ const aiTriggers = [
+    "write",
+    "generate",
+    "create",
+    "story",
+    "essay",
+    "poem",
+    "quiz",
+    "translate",
+    "summarize",
+    "compare",
+    "plan"
+];
+
+if (aiTriggers.some(word => message.includes(word))) {
+    return null;
+}
+
  let bestMatch = null;
  let highestScore = 0;
 
- for (const item of technologyReplies) {
+for (const item of technologyReplies) {
 
     let score = 0;
 
     for (const keyword of item.keywords) {
 
-        const key = keyword.toLowerCase();
-        if (similarity(message, key) >= 0.75) {
-        score += 4;
-        }
+        // Similarity only for short messages
+     if (message.length <= 40 && similarity(message, key) >= 0.90) {
+     score += 4;
+     }
 
         // Exact keyword match gets higher score
         if (message === key) {
@@ -482,17 +505,17 @@ function getMockReply(text) {
     }
 }
 
-  // Return the best matching technology topic
- if (bestMatch) {
+ // Only use the knowledge base if we're confident
+ if (bestMatch && highestScore >= 6) {
+
     return {
-    title: bestMatch.title,
-    category: bestMatch.category,
-    difficulty: bestMatch.difficulty,
-    estimatedReadTime: bestMatch.estimatedReadTime,
-    relatedTopics: bestMatch.relatedTopics,
-    
-    
-    reply: `
+        title: bestMatch.title,
+        category: bestMatch.category,
+        difficulty: bestMatch.difficulty,
+        estimatedReadTime: bestMatch.estimatedReadTime,
+        relatedTopics: bestMatch.relatedTopics,
+
+        reply: `
  📚 ${bestMatch.title}
 
  📂 Category: ${bestMatch.category}
@@ -507,12 +530,12 @@ function getMockReply(text) {
 
  ${bestMatch.relatedTopics.map(topic => `• ${topic}`).join("\n")}
  `
- };
- }
- 
-   
- return null; // No matching knowledge base topic found, use Gemini API
+    };
+
 }
+
+// No good knowledge-base match → use Gemini
+return null;
 
 function getSuggestions(text) {
 
@@ -582,7 +605,11 @@ async function fetchAIReply(userMessage) {
 const data = await response.json();
 
 if (!response.ok) {
-    throw new Error(data.reply || `HTTP ${response.status}`);
+   throw new Error(
+    data.reply ||
+    data.error ||
+    `Server Error (${response.status})`
+);
 }
 
 return data.reply;
@@ -765,7 +792,14 @@ ${createSuggestionButtons(suggestions)}
 // No local answer or suggestion, ask Gemini
 addTyping();
 
- const aiReply = await fetchAIReply(messageText);
+sendBtn.disabled = true;
+chatInput.disabled = true;
+
+const aiReply = await fetchAIReply(messageText);
+
+sendBtn.disabled = false;
+chatInput.disabled = false;
+chatInput.focus();
 
  removeTyping();
 
