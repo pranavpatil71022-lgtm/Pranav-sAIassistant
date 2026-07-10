@@ -1,7 +1,26 @@
 export default async function handler(request, response) {
 
-    const { message, systemPrompt } = request.body;
+    if (request.method !== "POST") {
+        return response.status(405).json({
+            reply: "Use POST request."
+        });
+    }
+
+    const { message, systemPrompt } = request.body || {};
+
+    if (!message) {
+        return response.status(400).json({
+            reply: "Message is required."
+        });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
+
+ if (!apiKey) {
+    return response.status(500).json({
+        reply: "GEMINI_API_KEY is missing."
+    });
+    }
 
     try {
 
@@ -27,6 +46,14 @@ export default async function handler(request, response) {
         );
 
         const data = await aiResponse.json();
+
+        if (!aiResponse.ok) {
+    console.error(data);
+
+    return response.status(aiResponse.status).json({
+        reply: data.error?.message || "Gemini API Error"
+    });
+    }
 
 
         if (!data.candidates || !data.candidates.length) {
