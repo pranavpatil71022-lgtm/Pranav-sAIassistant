@@ -578,40 +578,27 @@ async function fetchAIReply(userMessage) {
             })
 
         });
+const data = await response.json();
 
-        if (!response.ok) {
+if (!response.ok) {
+    throw new Error(data.reply || `HTTP ${response.status}`);
+}
 
-     const err = new Error(`HTTP ${response.status}`);
-     err.status = response.status;
-
-     throw err;
-      }
-
-        const data = await response.json();
-
-        return data.reply;
+return data.reply;
 
     } 
      
-     catch (error) {
+    catch (error) {
 
-     console.error(error);
+    console.error(error);
 
-     if (error.status === 429) {
-
-        addMessage(
-            "bot",
-            "⚠️ I'm currently handling a high volume of requests.<br><br>Please try again in a few moments."
-        );
-
-        return;
-     }
-
-     addMessage(
+    addMessage(
         "bot",
-        "⚠️ I'm currently handling a high volume of requests.<br><br>Please try again in a few moments."
+        `❌ ${error.message}`
     );
- }
+
+    return null;
+}
 }
 
 // Main function to handle sending messages

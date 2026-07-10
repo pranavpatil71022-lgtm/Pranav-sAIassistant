@@ -75,7 +75,7 @@ export default async function handler(request, response) {
         console.error(error);
 
         return response.status(500).json({
-            reply: "Error processing your request."
+           reply: error.message
         });
 
     }
