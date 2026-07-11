@@ -14,13 +14,13 @@ export default async function handler(request, response) {
         });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
- if (!apiKey) {
+ const apiKey = process.env.GEMINI_API_KEY;
+ 
+if (!apiKey) {
     return response.status(500).json({
         reply: "GEMINI_API_KEY is missing."
     });
-    }
+}
 
     try {
 

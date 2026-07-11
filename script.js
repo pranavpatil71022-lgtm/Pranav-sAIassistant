@@ -31,6 +31,15 @@ General Rules:
 const chatBody = document.getElementById('chatBody');
 const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
+chatInput.addEventListener("focus", () => {
+
+    setTimeout(() => {
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+    }, 300);
+
+});
 const chatWidget = document.getElementById('chatWidget');
 const chatLauncher = document.getElementById('chatLauncher');
 const closeChat = document.getElementById('closeChat');
@@ -48,8 +57,8 @@ let history = [];
 let lastUserMessage = "";
 
 // ===== Rate Limiting =====
-const MAX_MESSAGES_PER_MINUTE = 10;
-const RATE_LIMIT_WINDOW = 60 * 1000;
+const MAX_MESSAGES_PER_WINDOW = 5;
+const RATE_LIMIT_WINDOW = 30 * 60 * 1000; // 30 minutes
 let messageTimestamps = [];
 
 // ===== Chat Protection =====
@@ -64,6 +73,29 @@ const abusiveWords = [
     "fuck","fucking","bitch","asshole","bastard","idiot",
     "madarchod","bhenchod","mc","bc","chutiya","gandu",
     "lund","randi","harami","kutta","bsdk","mkc","gand"
+];
+
+const AI_TRIGGER_WORDS = [
+    "write",
+    "generate",
+    "create",
+    "story",
+    "essay",
+    "poem",
+    "quiz",
+    "translate",
+    "summarize",
+    "compare",
+    "plan",
+    "design",
+    "build",
+    "develop",
+    "code",
+    "program",
+    "debug",
+    "solve",
+    "analyze",
+    "review"
 ];
 
 function getGreeting() {
@@ -84,6 +116,35 @@ function getGreeting() {
     return "🌙 Good Night";
 }
 
+const USER_AVATAR = `
+<svg class="user-avatar-svg" viewBox="0 0 64 64">
+
+<defs>
+<linearGradient id="userGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#8B5CF6"/>
+<stop offset="100%" stop-color="#5B21B6"/>
+</linearGradient>
+</defs>
+
+<circle cx="32" cy="32" r="30" fill="url(#userGradient)"/>
+
+<circle cx="32" cy="24" r="10" fill="white"/>
+
+<path
+d="M16 50 C18 40 25 36 32 36 C39 36 46 40 48 50"
+fill="white"/>
+
+</svg>
+`;
+
+const BOT_AVATAR = `
+<img
+    src="cortexflowai.logo.png"
+    alt="CortexFlowAI"
+    class="bot-logo"
+>
+`;
+
 function addMessage(role, html){
   const row = document.createElement('div');
   row.className = 'msg-row ' + (role === 'user' ? 'user' : 'bot');
@@ -93,7 +154,9 @@ function addMessage(role, html){
 });
 
 row.innerHTML = `
-<div class="msg-avatar">${role === 'user' ? '😊' : '🤖'}</div>
+<div class="msg-avatar">
+    ${role === "user" ? USER_AVATAR : BOT_AVATAR}
+</div>
 <div class="msg-bubble">
     <div class="message-content">
         ${html}
@@ -124,14 +187,6 @@ row.innerHTML = `
 document.addEventListener("click", (e) =>{
 
  // Suggestion buttons
- if (e.target.classList.contains("suggestion-chip")) {
-
-    chatInput.value = e.target.dataset.topic;
-
-    handleUserSendMessage();
-
-    return;
-}
 
     // Copy
     if (e.target.classList.contains("copy-btn")) {
@@ -211,22 +266,97 @@ function setChatStatus(text, typing = false){
 }
 
 function addTyping(){
-  setChatStatus('CortexFlowAI is thinking...', true);
-  const row = document.createElement('div');
-  row.className = 'msg-row bot';
-  row.id = 'typingRow';
-  row.innerHTML = `
-    <div class="msg-avatar">🤖</div>
-    <div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
-  `;
-  chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
+
+    const status = document.querySelector(".chat-status");
+
+    if(status){
+        status.textContent = "🧠 Analyzing your question...";
+        status.classList.add("typing");
+    }
+
+    const row = document.createElement("div");
+
+    row.className = "msg-row bot";
+
+    row.id = "typingRow";
+
+    row.innerHTML = `
+<div class="msg-avatar">
+    ${BOT_AVATAR}
+</div>
+
+<div class="msg-bubble">
+
+    <div class="thinking-stage">
+        🧠 Analyzing your question...
+    </div>
+
+    <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+</div>
+`;
+
+    chatBody.appendChild(row);
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    setTimeout(() => {
+
+    const stage = row.querySelector(".thinking-stage");
+
+    if(stage){
+        stage.textContent = "📚 Searching knowledge...";
+    }
+
+}, 700);
+
+setTimeout(() => {
+
+    const stage = row.querySelector(".thinking-stage");
+
+    if(stage){
+        stage.textContent = "⚡ Processing information...";
+    }
+
+}, 1400);
+
+setTimeout(() => {
+
+    const stage = row.querySelector(".thinking-stage");
+
+    if(stage){
+        stage.textContent = "✨ Preparing response...";
+    }
+
+}, 1900);
 }
 
 function removeTyping(){
   const t = document.getElementById('typingRow');
   if(t) t.remove();
   setChatStatus('Online', false);
+}
+
+function getThinkingTime(reply){
+
+    const text = String(reply).replace(/<[^>]*>/g, "");
+
+    const length = text.length;
+
+    if(length <= 120){
+        return 1200;
+    }
+
+    if(length <= 350){
+        return 2000;
+    }
+
+    return 2800;
+
 }
 
 let isDragging = false;
@@ -312,98 +442,287 @@ function escapeHtml(str){
 }
 
 function formatBotText(text){
-  // basic markdown-ish: bullet lines starting with "- " become <ul><li>
-  const lines = text.split('\n').filter(l => l.trim() !== '');
-  let html = '';
-  let inList = false;
-  for(const line of lines){
-    const trimmed = line.trim();
-    if(trimmed.startsWith('- ') || trimmed.startsWith('• ')){
-      if(!inList){ html += '<ul>'; inList = true; }
-      html += `<li>${escapeHtml(trimmed.replace(/^[-•]\s*/, ''))}</li>`;
-    } else {
-      if(inList){ html += '</ul>'; inList = false; }
-      html += `<div>${escapeHtml(trimmed)}</div>`;
+
+    let html = escapeHtml(text);
+
+    // -----------------------------
+    // Bold (**text**)
+    // -----------------------------
+    html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+
+    // -----------------------------
+    // Email links
+    // -----------------------------
+    html = html.replace(
+        /([\w.-]+@[\w.-]+\.\w+)/g,
+        '<a href="mailto:$1">$1</a>'
+    );
+
+
+    // -----------------------------
+    // Inline code (`code`)
+    // -----------------------------
+    html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+    const lines = html.split("\n");
+
+    let output = "";
+    let inList = false;
+
+    for(const line of lines){
+
+        const trimmed = line.trim();
+
+        // Bullet List
+        if(trimmed.startsWith("- ") || trimmed.startsWith("• ")){
+
+            if(!inList){
+
+                output += "<ul>";
+
+                inList = true;
+
+            }
+
+            output += `<li>${trimmed.replace(/^[-•]\s*/, "")}</li>`;
+
+        }
+
+        // Numbered List
+        else if(/^\d+\.\s/.test(trimmed)){
+
+            if(!inList){
+
+                output += "<ol>";
+
+                inList = "ol";
+
+            }
+
+            output += `<li>${trimmed.replace(/^\d+\.\s/, "")}</li>`;
+
+        }
+
+        else{
+
+            if(inList){
+
+                output += inList === "ol" ? "</ol>" : "</ul>";
+
+                inList = false;
+
+            }
+
+            if(trimmed !== ""){
+
+                output += `<div>${trimmed}</div>`;
+
+            }
+
+        }
+
     }
-  }
-  if(inList) html += '</ul>';
-  // simple email/link detection
-  html = html.replace(/([\w.-]+@[\w.-]+\.\w+)/g, '<a href="mailto:$1">$1</a>');
-  return html;
+
+    if(inList){
+
+        output += inList === "ol" ? "</ol>" : "</ul>";
+
+    }
+
+    return output;
+
 }
 
 const cannedReplies = [ 
-{pattern:/^\s*(hello|hi|hey)\s*$/i, reply:"Hello! 👋 Welcome to CortexFlowAI. How can I assist you today?"},
-{pattern:/^\s*good morning\s*$/i, reply:"Good morning! ☀️ I hope you're having a great day. How can I help you?"},
-{pattern:/^\s*good afternoon\s*$/i, reply:"Good afternoon! 😊 What can I help you with today?"},
-{pattern:/^\s*good evening\s*$/i, reply:"Good evening! 🌙 Feel free to ask me anything."},
-{pattern:/^\s*good night\s*$/i, reply:"Good night! 🌟 Have a restful sleep and see you again soon."},
-{pattern:/^\s*how are you\s*$/i, reply:"I'm doing great and ready to help! What would you like to know?"},
-{pattern:/^\s*nice to meet you\s*$/i, reply:"Nice to meet you too! It's a pleasure to chat with you."},
-{pattern:/^\s*welcome\s*$/i, reply:"Thank you! I'm always happy to help."},
-{pattern:/^\s*(thank|thanks|thank you)\s*$/i, reply:"You're very welcome! Let me know if there's anything else I can help with."},
-{pattern:/^\s*(bye|goodbye|see you)\s*$/i, reply:"Goodbye! 👋 Thanks for visiting CortexFlowAI. Have an amazing day!"},
-{pattern:/^\s*(who are you|introduce yourself)\s*$/i, reply:"I'm CortexFlowAI, an AI assistant created to answer questions, explain concepts, and provide information about technology and this portfolio."},
-{pattern:/^\s*what is cortexflowai\s*$/i, reply:"CortexFlowAI is a custom AI assistant developed to provide intelligent conversations, explain technical topics, and answer portfolio-related questions."},
-{pattern:/^\s*(who made you|who created you)\s*$/i, reply:"CortexFlowAI was designed and developed by Pranav Patil."},
-{pattern:/^\s*what can you do\s*$/i, reply:"I can answer questions, explain technical concepts, assist with programming, provide portfolio information, and help with general knowledge."},
-{pattern:/^\s*your purpose\s*$/i, reply:"My purpose is to provide useful, accurate, and easy-to-understand information while showcasing Pranav's work and projects."},
-{pattern:/^\s*(are you ai|are you chatbot)\s*$/i, reply:"Yes. I'm an AI-powered assistant built to help answer questions and provide useful information."},
-{pattern:/^\s*which ai model\s*$/i, reply:"I use Google's Gemini AI for intelligent responses along with a built-in knowledge base for faster answers."},
-{pattern:/^\s*(offline|without internet)\s*$/i, reply:"Some questions are answered instantly using my built-in knowledge base, while others require an AI response."},
-{pattern:/^\s*languages do you support\s*$/i, reply:"I can understand and respond in English, Marathi, Hindi, and several other languages."},
-{pattern:/^\s*(help|commands?)\s*$/i, reply:"You can ask me about programming, technology, science, mathematics, general knowledge, or Pranav's portfolio."},
-{pattern:/^\s*who is pranav\s*$/i, reply:"Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer passionate about building modern web applications and AI-powered solutions."},
-{pattern:/^\s*about pranav\s*$/i, reply:"Pranav is a student, web developer, and technology enthusiast who enjoys learning, building projects, and solving real-world problems through software."},
-{pattern:/^\s*(full name|complete name)\s*$/i, reply:"The creator of this portfolio is Pranav Ganesh Patil."},
-{pattern:/^\s*what does pranav do\s*$/i, reply:"Pranav focuses on web development, software engineering, AI-based applications, and continuously improving his programming skills."},
-{pattern:/^\s*(profession|career)\s*$/i, reply:"Pranav is currently a student preparing for a career in software engineering while actively building practical projects."},
-{pattern:/^\s*(goal|dream|ambition)\s*$/i, reply:"Pranav's goal is to become a skilled software engineer, build impactful products, and contribute to innovative technology."},
-{pattern:/^\s*future plan\s*$/i, reply:"Pranav plans to continue learning advanced software development, AI, cybersecurity, and full-stack technologies."},
-{pattern:/^\s*(education|study)\s*$/i, reply:"Pranav is currently pursuing his studies while balancing software development and personal projects."},
-{pattern:/^\s*jee\s*$/i, reply:"Alongside software development, Pranav is preparing for the Joint Entrance Examination (JEE)."},
-{pattern:/^\s*experience\s*$/i, reply:"Pranav gains experience by building real-world projects, exploring new technologies, and continuously practicing programming."},
-{pattern:/^\s*(learning|currently learning)\s*$/i, reply:"Pranav is continuously improving his knowledge in web development, data structures, algorithms, AI, and modern software engineering."},
-{pattern:/^\s*developer\s*$/i, reply:"Yes. Pranav is a web developer who enjoys creating responsive, interactive, and AI-powered applications."},
-{pattern:/^\s*(programmer|coding)\s*$/i, reply:"Programming is one of Pranav's strongest interests. He enjoys solving problems and building practical software."},
-{pattern:/^\s*strength\s*$/i, reply:"Pranav's strengths include curiosity, consistency, problem-solving, and a passion for learning new technologies."},
-{pattern:/^\s*(interests|hobbies)\s*$/i, reply:"Pranav enjoys coding, learning about technology, exploring AI, and building projects that solve real-world problems."},
-{pattern:/^\s*achievement\s*$/i, reply:"One of Pranav's achievements is developing CortexFlowAI along with several web development projects while continuously expanding his technical skills."},
-{pattern:/^\s*why coding\s*$/i, reply:"Pranav enjoys coding because it combines creativity, logical thinking, and the opportunity to build useful products."},
-{pattern:/^\s*why software engineering\s*$/i, reply:"Software engineering allows Pranav to create innovative solutions, continuously learn, and work on impactful technologies."},
-{pattern:/^\s*motivation\s*$/i, reply:"Pranav is motivated by continuous learning, solving challenging problems, and turning ideas into real applications."},
-{pattern:/^\s*(creator|owner)\s*$/i, reply:"Pranav Patil is the creator and owner of CortexFlowAI and this portfolio website."},
-{pattern:/^\s*cortexflowai project\s*$/i, reply:"CortexFlowAI is an AI-powered assistant designed to answer portfolio questions, explain technical concepts, and provide an interactive experience for visitors."},
-{pattern:/^\s*portfolio\s*$/i, reply:"This portfolio showcases Pranav's projects, technical skills, achievements, learning journey, and contact information in one place."},
-{pattern:/^\s*website\s*$/i, reply:"This website serves as Pranav's personal portfolio, highlighting his work, experience, projects, and technical capabilities."},
-{pattern:/^\s*features\s*$/i, reply:"The portfolio includes an AI assistant, responsive design, modern user interface, project showcase, contact form, and social media integration."},
-{pattern:/^\s*design\s*$/i, reply:"The website follows a modern AI-inspired design with smooth animations, clean layouts, and an intuitive user interface."},
-{pattern:/^\s*(ui|user interface)\s*$/i, reply:"The user interface is designed to be clean, responsive, visually appealing, and easy to navigate."},
-{pattern:/^\s*(dark mode|theme)\s*$/i, reply:"The portfolio uses a modern dark theme to improve readability and provide a premium user experience."},
-{pattern:/^\s*(technology used|built with)\s*$/i, reply:"The portfolio is built using HTML, CSS, JavaScript, and integrates Google's Gemini AI for intelligent conversations."},
-{pattern:/^\s*chatbot\s*$/i, reply:"CortexFlowAI is a custom chatbot built specifically for this portfolio to provide intelligent and interactive assistance."},
-{pattern:/^\s*ai assistant\s*$/i, reply:"The AI assistant combines a local knowledge base with Gemini AI to provide fast and intelligent responses."},
-{pattern:/^\s*open source\s*$/i, reply:"Some projects may be available through Pranav's GitHub profile. Check the GitHub section for more information."},
-{pattern:/^\s*(github repository|repository)\s*$/i, reply:"Project repositories can be explored through Pranav's GitHub profile linked on this website."},
-{pattern:/^\s*updates\s*$/i, reply:"The portfolio is continuously updated with new features, projects, and improvements."},
-{pattern:/^\s*future projects\s*$/i, reply:"Pranav plans to build more AI-powered applications, full-stack projects, and software engineering solutions."},
-{pattern:/^\s*best project\s*$/i, reply:"CortexFlowAI is currently one of Pranav's most advanced and feature-rich projects."},
-{pattern:/^\s*show projects\s*$/i, reply:"Visit the Projects section of this portfolio to explore Pranav's latest work and ongoing developments."},
-{pattern:/^\s*(projects|my projects)\s*$/i, reply:"Pranav has developed multiple web development projects that demonstrate his skills in frontend development, responsive design, and AI integration."},
-{pattern:/^\s*latest project\s*$/i, reply:"One of Pranav's latest projects is CortexFlowAI, an intelligent AI assistant integrated into his personal portfolio website."},
-{pattern:/^\s*cortexflowai project\s*$/i, reply:"CortexFlowAI is an AI-powered assistant designed to answer portfolio questions, explain technical concepts, and provide an interactive experience for visitors."},
-{pattern:/^\s*portfolio\s*$/i, reply:"This portfolio showcases Pranav's projects, technical skills, achievements, learning journey, and contact information in one place."},
-{pattern:/^\s*responsive\s*$/i, reply:"Yes. The portfolio is fully responsive and designed to provide a smooth experience across desktop, tablet, and mobile devices."},
-{pattern:/^\s*(ui|user interface)\s*$/i, reply:"The user interface is designed to be clean, responsive, visually appealing, and easy to navigate."},
-{pattern:/^\s*(dark mode|theme)\s*$/i, reply:"The portfolio uses a modern dark theme to improve readability and provide a premium user experience."},
-{pattern:/^\s*(technology used|built with)\s*$/i, reply:"The portfolio is built using HTML, CSS, JavaScript, and integrates Google's Gemini AI for intelligent conversations."},
-{pattern:/^\s*ai assistant\s*$/i, reply:"The AI assistant combines a local knowledge base with Gemini AI to provide fast and intelligent responses."},
-{pattern:/^\s*open source\s*$/i, reply:"Some projects may be available through Pranav's GitHub profile. Check the GitHub section for more information."},
-{pattern:/^\s*(github repository|repository)\s*$/i, reply:"Project repositories can be explored through Pranav's GitHub profile linked on this website."},
-{pattern:/^\s*updates\s*$/i, reply:"The portfolio is continuously updated with new features, projects, and improvements."},
-{pattern:/^\s*best project\s*$/i, reply:"CortexFlowAI is currently one of Pranav's most advanced and feature-rich projects."},
-{pattern:/^\s*why portfolio\s*$/i, reply:"The portfolio demonstrates Pranav's technical skills, project experience, and growth as a software developer."},
-{pattern:/^\s*show projects\s*$/i, reply:"Visit the Projects section of this portfolio to explore Pranav's latest work and ongoing developments."}
+{
+    pattern:/hello|hi|hey/i,
+    aliases:["hello","helo","hell","hi","hii","hiii","hey","heyy","hy"],
+    reply:"Hello! 👋 Welcome to CortexFlowAI. How can I assist you today?"
+},
+
+{
+    pattern:/good morning/i,
+    aliases:["good morning","gm","gmorning","gud morning","morning"],
+    reply:"Good morning! ☀️ I hope you're having a great day. How can I help you?"
+},
+
+{
+    pattern:/good afternoon/i,
+    aliases:["good afternoon","afternoon","gud afternoon"],
+    reply:"Good afternoon! 😊 What can I help you with today?"
+},
+
+{
+    pattern:/good evening/i,
+    aliases:["good evening","evening","gud evening"],
+    reply:"Good evening! 🌙 Feel free to ask me anything."
+},
+
+{
+    pattern:/good night/i,
+    aliases:["good night","night","gn","gud night"],
+    reply:"Good night! 🌟 Have a restful sleep and see you again soon."
+},
+
+{
+    pattern:/how are you/i,
+    aliases:["how are you","how r u","how are u","hru","hw r u"],
+    reply:"I'm doing great and ready to help! What would you like to know?"
+},
+
+{
+    pattern:/thank|thanks/i,
+    aliases:["thank","thanks","thank you","thankyou","thx","thanx","ty"],
+    reply:"You're very welcome! Let me know if there's anything else I can help with."
+},
+
+{
+    pattern:/bye|goodbye|see you/i,
+    aliases:["bye","byee","goodbye","see you","see ya","cya"],
+    reply:"Goodbye! 👋 Thanks for visiting CortexFlowAI. Have an amazing day!"
+},
+
+{
+    pattern:/who made you|who created you/i,
+    aliases:[
+        "who made you",
+        "who created you",
+        "creator",
+        "created by",
+        "made by",
+        "your creator"
+    ],
+    reply:"CortexFlowAI was designed and developed by Pranav Patil."
+},
+
+{
+    pattern:/who is pranav/i,
+    aliases:[
+        "who is pranav",
+        "pranav",
+        "pranav patil",
+        "about pranav",
+        "creator"
+    ],
+    reply:"Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer passionate about building modern web applications and AI-powered solutions."
+},
+
+{
+    pattern:/what is cortexflowai/i,
+    aliases:[
+        "cortexflowai",
+        "cortex flow ai",
+        "what is cortexflowai",
+        "what is cortex flow ai",
+        "about cortexflowai",
+        "flow ai",
+        "flowai"
+
+    ],
+    reply:"CortexFlowAI is a custom AI assistant developed to provide intelligent conversations, explain technical topics, and answer portfolio-related questions."
+},
+
+{
+    pattern:/what can you do/i,
+    aliases:[
+        "what can you do",
+        "what do you do",
+        "help",
+        "what can i ask",
+        "capabilities",
+        "functions",
+        "features"
+    ],
+    reply:"I can answer questions, explain technical concepts, assist with programming, provide portfolio information, and help with general knowledge."
+},
+
+{
+    pattern:/help|commands/i,
+    aliases:[
+        "help",
+        "commands",
+        "support",
+        "assist",
+        "guide",
+        "how to use",
+        "what can i ask"
+    ],
+    reply:"You can ask me about programming, technology, science, mathematics, general knowledge, or Pranav's portfolio."
+},
+
+{
+    pattern:/ai assistant/i,
+    aliases:[
+        "ai",
+        "assistant",
+        "chatbot",
+        "bot",
+        "virtual assistant"
+    ],
+    reply:"The AI assistant combines a local knowledge base with Gemini AI to provide fast and intelligent responses."
+},
+
+{
+    pattern:/resume|cv/i,
+    aliases:["resume","cv","curriculum vitae","my resume","build resume","resume tips"],
+    reply:"A strong resume should be clear, concise, ATS-friendly, and highlight your skills, projects, education, achievements, and experience. Keep it to one page if possible and tailor it to the job you're applying for."
+},
+
+{
+    pattern:/portfolio/i,
+    aliases:["portfolio","personal portfolio","developer portfolio","portfolio website"],
+    reply:"A good developer portfolio should showcase your best projects, technical skills, achievements, resume, GitHub profile, contact information, and a short introduction. It should be responsive, fast, and easy to navigate."
+},
+
+{
+    pattern:/github/i,
+    aliases:["github profile","github account","repositories","repo"],
+    reply:"A well-maintained GitHub profile should include clean repositories, meaningful README files, consistent commits, and projects that demonstrate your programming skills."
+},
+
+{
+    pattern:/linkedin/i,
+    aliases:["linkedin","linkedin profile"],
+    reply:"A strong LinkedIn profile should include a professional photo, clear headline, detailed About section, skills, projects, certifications, and work or academic experience."
+},
+
+{
+    pattern:/interview/i,
+    aliases:["interview","job interview","technical interview","interview preparation"],
+    reply:"For software engineering interviews, focus on Data Structures & Algorithms, problem-solving, system design (if applicable), core CS subjects, projects, communication skills, and mock interviews."
+},
+
+{
+    pattern:/project ideas|project/i,
+    aliases:["project","projects","project ideas","software project","web project"],
+    reply:"Strong portfolio projects solve real-world problems. Examples include AI chatbots, task managers, expense trackers, e-commerce websites, social media apps, and full-stack dashboards."
+},
+
+{
+    pattern:/skills/i,
+    aliases:["skills","technical skills","developer skills","software skills"],
+    reply:"Essential software engineering skills include HTML, CSS, JavaScript, Git, GitHub, one frontend framework (React), one backend technology (Node.js), databases, problem-solving, and basic system design."
+},
+
+{
+    pattern:/internship/i,
+    aliases:["internship","internships","get internship","software internship"],
+    reply:"To improve your chances of getting an internship, build strong projects, maintain an active GitHub profile, prepare a good resume, practice coding problems, and apply consistently."
+},
+
+{
+    pattern:/career/i,
+    aliases:["career","software engineer","developer career","career advice"],
+    reply:"A software engineering career is built through continuous learning, practical projects, problem-solving skills, teamwork, and keeping up with modern technologies."
+},
+
+{
+    pattern:/certification|certificate/i,
+    aliases:["certification","certifications","certificate","course certificate"],
+    reply:"Useful certifications include AWS Cloud Practitioner, Google Cloud, Microsoft Azure, Cisco, CompTIA, and other certifications relevant to your chosen technology stack."
+}
+
 ];
 
 
@@ -432,36 +751,46 @@ function getMockReply(text) {
   const normalized = text.toLowerCase();
   for (const item of cannedReplies) {
     const pattern = item.pattern;
+ {
+
     let matches = false;
 
-if (pattern instanceof RegExp) {
-    pattern.lastIndex = 0;
-    matches = pattern.test(normalized);
-} else {
-    matches = normalized.includes(String(pattern).toLowerCase());
+    // Regex match
+    if (item.pattern instanceof RegExp) {
+        item.pattern.lastIndex = 0;
+        matches = item.pattern.test(normalized);
+    }
+
+    // Alias fuzzy match
+    if (!matches && item.aliases) {
+
+        const words = normalized.split(/\s+/);
+
+        for (const inputWord of words) {
+
+            for (const alias of item.aliases) {
+
+                if (similarity(inputWord, alias) >= 0.80) {
+                    matches = true;
+                    break;
+                }
+
+            }
+
+            if (matches) break;
+        }
+    }
+
+    if (matches) {
+        return item.reply;
+    }
 }
-    
-    if (matches) return item.reply;
-  }}
+  }
  
   // Smart Technology Knowledge Base Search
  const message = text.toLowerCase();
 
- const aiTriggers = [
-    "write",
-    "generate",
-    "create",
-    "story",
-    "essay",
-    "poem",
-    "quiz",
-    "translate",
-    "summarize",
-    "compare",
-    "plan"
-];
-
-if (aiTriggers.some(word => message.includes(word))) {
+if (AI_TRIGGER_WORDS.some(word => message.includes(word))) {
     return null;
 }
 
@@ -474,14 +803,16 @@ for (const item of technologyReplies) {
 
     for (const keyword of item.keywords) {
 
+        const key = keyword.toLowerCase();
+
         // Similarity only for short messages
-     if (message.length <= 40 && similarity(message, key) >= 0.90) {
+     if (message.length <= 40 && similarity(message, key) >= 0.9) {
      score += 4;
      }
 
         // Exact keyword match gets higher score
         if (message === key) {
-            score += 5;
+            score += 7;
         }
 
         // Contains keyword
@@ -532,10 +863,11 @@ for (const item of technologyReplies) {
  `
     };
 
-}
+ }
 
 // No good knowledge-base match → use Gemini
 return null;
+}
 
 function getSuggestions(text) {
 
@@ -563,21 +895,162 @@ function getSuggestions(text) {
         if (suggestions.length >= 5) break;
     }
 
-    return suggestions;
+// Shuffle suggestions
+const shuffled = [...suggestions];
+
+for (let i = shuffled.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+
+}
+
+// Return only first 3 random suggestions
+return shuffled.slice(0, 3);
+
+}
+
+function getRandomKnowledgeTopics(count = 4) {
+
+    const shuffled = [...technologyReplies]
+        .sort(() => Math.random() - 0.5);
+
+    return shuffled.slice(0, count);
+
+}
+
+function createLimitCard() {
+
+    const topics = getRandomKnowledgeTopics();
+
+    return `
+        <div class="ai-limit-card">
+
+            <div class="limit-icon">⚠️</div>
+
+            <div class="limit-title">
+                AI Usage Limit Reached
+            </div>
+
+            <div class="limit-description">
+
+               You've reached the AI usage limit.
+
+                You can ask up to
+                <strong>5 AI-powered questions</strong>
+                every <strong>30 minutes</strong>.
+
+                Knowledge Base topics and portfolio questions remain available.
+
+                <br><br>
+
+                📚 While you wait, explore these topics:
+
+            </div>
+
+            ${createSuggestionButtons(topics)}
+
+        </div>
+    `;
+
 }
 
 function createSuggestionButtons(suggestions) {
 
+    const icons = {
+        "HTML": "🌐",
+        "CSS": "🎨",
+        "JavaScript": "🟨",
+        "Python": "🐍",
+        "Java": "☕",
+        "C": "💻",
+        "C++": "⚙️",
+        "C#": "🎯",
+        "React": "⚛️",
+        "Node": "🟢",
+        "Git": "🌿",
+        "GitHub": "🐙",
+        "Linux": "🐧",
+        "SQL": "🗄️",
+        "Database": "🗃️",
+        "API": "🔗",
+        "Networking": "🌍",
+        "Cybersecurity": "🔒",
+        "AI": "🤖"
+    };
+
     return `
         <div class="suggestion-container">
 
-            ${suggestions.map(item => `
-                <button
-                    class="suggestion-chip"
-                    data-topic="${item.title}">
-                    ${item.title}
-                </button>
-            `).join("")}
+            ${suggestions.map(item => {
+
+                let icon = "📘";
+
+                for (const key in icons) {
+                    if (item.title.toLowerCase().includes(key.toLowerCase())) {
+                        icon = icons[key];
+                        break;
+                    }
+                }
+
+                return `
+                    <button
+                        class="suggestion-card"
+                        data-topic="${item.title}">
+                        <span class="suggestion-icon">${icon}</span>
+                        <span class="suggestion-title">${item.title}</span>
+                        <span class="suggestion-arrow">→</span>
+                    </button>
+                `;
+            }).join("")}
+
+        </div>
+    `;
+}
+
+function getRandomKnowledgeTopics(count = 4) {
+
+    const shuffled = [...technologyReplies]
+        .sort(() => Math.random() - 0.5);
+
+    return shuffled.slice(0, count);
+
+}
+
+function createLimitCard() {
+
+    const topics = getRandomKnowledgeTopics(4);
+
+    return `
+        <div class="ai-limit-card">
+
+            <div class="limit-icon">
+                ⚠️
+            </div>
+
+            <div class="limit-title">
+                AI Usage Limit Reached
+            </div>
+
+            <div class="limit-description">
+
+                You've used all
+                <strong>5 AI questions</strong>
+                in the last
+                <strong>30 minutes</strong>.
+
+            </div>
+
+            <div class="limit-divider"></div>
+
+            <div class="limit-subtitle">
+
+                📚 Continue Learning
+
+            </div>
+
+            ${createSuggestionButtons(topics)}
 
         </div>
     `;
@@ -605,27 +1078,21 @@ async function fetchAIReply(userMessage) {
 const data = await response.json();
 
 if (!response.ok) {
-   throw new Error(
-    data.reply ||
-    data.error ||
-    `Server Error (${response.status})`
-);
+    throw new Error(data.reply || `HTTP ${response.status}`);
 }
 
 return data.reply;
 
     } 
      
-    catch (error) {
+catch (error) {
 
-    console.error(error);
+    console.error("Gemini API Error:", error);
 
-    addMessage(
-        "bot",
-        `❌ ${error.message}`
-    );
-
-    return null;
+    return {
+        error: true,
+        message: error.message
+    };
 }
 }
 
@@ -635,12 +1102,12 @@ function isRateLimited() {
 
     const now = Date.now();
 
-    // Keep only timestamps from the last 60 seconds
+    // Keep only timestamps from the last 30 minutes
     messageTimestamps = messageTimestamps.filter(
         time => now - time < RATE_LIMIT_WINDOW
     );
 
-    if (messageTimestamps.length >= MAX_MESSAGES_PER_MINUTE) {
+    if (messageTimestamps.length >= MAX_MESSAGES_PER_WINDOW) {
         return true;
     }
 
@@ -654,34 +1121,79 @@ function checkSpamProtection(messageText) {
 
     // Check repeated message
     if (msg === lastMessage) {
-        repeatCount++;
-    } else {
-        repeatCount = 1;
-        lastMessage = msg;
-    }
+
+    repeatCount++;
+
+} else {
+
+    // New message → reset spam detection
+    repeatCount = 1;
+    lastMessage = msg;
+
+}
 
     // Check abusive words
     const isAbusive = abusiveWords.some(word => msg.includes(word));
 
-    if (repeatCount >= 3 || isAbusive) {
+    // 3rd repeated message
+    if (repeatCount === 3 && !isAbusive) {
 
-        warningCount++;
+        const topics = getRandomKnowledgeTopics(4);
 
-        if (warningCount === 1) {
-            addMessage(
-                "bot",
-                "⚠️ Please don't repeatedly send the same message."
-            );
-            return false;
-        }
+        addMessage(
+            "bot",
+            `
+<div class="warning-card">
 
-        if (warningCount === 2) {
-            addMessage(
-                "bot",
-                "⚠️ Final warning. Continued violations will temporarily disable the chat."
-            );
-            return false;
-        }
+    <div class="warning-title">
+        ⚠️ It looks like you're testing CortexFlowAI.
+    </div>
+
+    <div class="warning-text">
+        Instead of sending the same message repeatedly,
+        try exploring one of these topics.
+    </div>
+
+    ${createSuggestionButtons(topics)}
+
+</div>
+`
+        );
+
+        return false;
+    }
+
+    // 4th repeated message
+    if (repeatCount === 4 && !isAbusive) {
+
+        addMessage(
+            "bot",
+            `
+<div class="warning-card final-warning">
+
+    <div class="warning-title">
+        🚨 Final Warning
+    </div>
+
+    <div class="warning-text">
+
+        One more repeated message will temporarily disable the chat.
+
+        <br><br>
+
+        Try asking a different question instead.
+
+    </div>
+
+</div>
+`
+        );
+
+        return false;
+    }
+
+    // 5th repeated message OR abusive language
+    if (repeatCount >= 5 || isAbusive) {
 
         blockedUntil = Date.now() + BLOCK_TIME;
 
@@ -690,7 +1202,25 @@ function checkSpamProtection(messageText) {
 
         addMessage(
             "bot",
-            "🚫 Chat has been temporarily disabled for 5 minutes."
+            `
+<div class="block-card">
+
+    <div class="block-title">
+        🚫 Chat Temporarily Disabled
+    </div>
+
+    <div class="block-text">
+
+        Repeated messages have triggered spam protection.
+
+        <br><br>
+
+        Please wait <strong>5 minutes</strong> before sending more messages.
+
+    </div>
+
+</div>
+`
         );
 
         localStorage.setItem("blockedUntil", blockedUntil);
@@ -700,8 +1230,8 @@ function checkSpamProtection(messageText) {
             chatInput.disabled = false;
             sendBtn.disabled = false;
 
-            warningCount = 0;
             repeatCount = 0;
+            lastMessage = "";
 
             localStorage.removeItem("blockedUntil");
 
@@ -710,28 +1240,24 @@ function checkSpamProtection(messageText) {
         return false;
     }
 
+    if (repeatCount === 1) {
+    // Different message, normal conversation
+}
     return true;
 }
 
 async function handleUserSendMessage() {
   const messageText = chatInput.value.trim();
+  const cleanMessage = messageText
+    .toLowerCase()
+    .replace(/[^\w\s+#]/g, "")
+    .trim();
   if (!messageText) return;
 
   if (!checkSpamProtection(messageText)) {
     return;
  }
   
-
-  // ===== Rate Limit Check =====
- if (isRateLimited()) {
-
-    addMessage(
-        "bot",
-        "⚠️ You've reached the limit of 10 messages per minute.<br><br>Please wait about a minute before sending another message."
-    );
-
-    return;
- }
 
   // Clear input and display user message in the UI
   chatInput.value = '';
@@ -741,9 +1267,18 @@ async function handleUserSendMessage() {
   // Check local canned responses first
  
   // Check local knowledge base first
- const localReply = getMockReply(messageText);
+  const exactReply = technologyReplies.find(item => {
 
- if (localReply !== null) {
+    const cleanTitle = item.title
+        .toLowerCase()
+        .replace(/[^\w\s+#]/g, "")
+        .trim();
+
+    return cleanTitle === cleanMessage;
+
+});
+
+if (exactReply) {
 
     addTyping();
 
@@ -751,9 +1286,33 @@ async function handleUserSendMessage() {
 
         removeTyping();
 
-        addMessage('bot', formatBotText(localReply.reply || localReply));
+        addMessage(
+            "bot",
+            formatBotText(exactReply.reply)
+        );
 
-    }, 400);
+    }, 900);
+
+    return;
+
+}
+ const localReply = getMockReply(messageText);
+
+if (localReply !== null) {
+
+    const formattedReply = formatBotText(localReply.reply || localReply);
+
+    const thinkingTime = getThinkingTime(formattedReply);
+
+    addTyping();
+
+    setTimeout(() => {
+
+        removeTyping();
+
+        addMessage("bot", formattedReply);
+
+    }, thinkingTime);
 
     return;
 }
@@ -766,46 +1325,103 @@ const suggestions = getSuggestions(messageText);
 
 if (suggestions.length > 0) {
 
+
+    
+
     addTyping();
 
     setTimeout(() => {
 
-        removeTyping();
 
-      addMessage(
-'bot',
-`
-<div>🤔 I couldn't find an exact match.</div>
+removeTyping();
 
-<br>
+     
+ addMessage(
+ 'bot',
+ `
+ <div class="suggestion-title-box">
 
-<div><strong>Try one of these topics:</strong></div>
+ 🤔 I couldn't find an exact answer.
 
-${createSuggestionButtons(suggestions)}
-`
+<br><br>
+ 
+ 📚 Here are some related topics you can explore.
+
+ </div>
+
+ ${createSuggestionButtons(suggestions)}
+ `
 );
 
-    }, 400);
+    }, 1800);
 
     return;
 }
+
+
+// Limit only Gemini requests
+if (isRateLimited()) {
+
+    addMessage(
+        "bot",
+        createLimitCard()
+    );
+
+    return;
+}
+
 // No local answer or suggestion, ask Gemini
 addTyping();
 
-sendBtn.disabled = true;
-chatInput.disabled = true;
-
 const aiReply = await fetchAIReply(messageText);
 
-sendBtn.disabled = false;
-chatInput.disabled = false;
-chatInput.focus();
+console.log("Gemini Reply:", aiReply);
 
  removeTyping();
 
- if (!aiReply) return;
+if (!aiReply) {
+    return;
+}
 
- addMessage(
+if (aiReply.error) {
+
+    addMessage(
+    "bot",
+    `
+<div class="ai-error-card">
+
+    <div class="ai-error-icon">
+        ⚠️
+    </div>
+
+    <div class="ai-error-title">
+        AI Service Temporarily Unavailable
+    </div>
+
+    <div class="ai-error-text">
+
+        I couldn't connect to Gemini right now.
+
+        <br><br>
+
+        You can:
+
+        <ul>
+            <li>🔄 Try again in a few seconds</li>
+            <li>✏️ Rephrase your question</li>
+            <li>🌐 Check your internet connection</li>
+        </ul>
+
+    </div>
+
+</div>
+`
+);
+
+    return;
+}
+
+addMessage(
     "bot",
     formatBotText(aiReply)
 );
@@ -820,7 +1436,79 @@ chatInput.addEventListener('keypress', (e) => {
   }
 });
 
+const welcomeTopics = [
+
+    { title: "Programming" },
+    { title: "JavaScript" },
+    { title: "Python" },
+    { title: "HTML" },
+    { title: "CSS" },
+    { title: "React" },
+    { title: "Artificial Intelligence" },
+    { title: "Cybersecurity" },
+    { title: "Technology" },
+    { title: "Projects" },
+    { title: "About Pranav" },
+    { title: "Skills" },
+    { title: "Contact Pranav" },
+    { title: "Git & GitHub" },
+    { title: "Linux" },
+    { title: "SQL" },
+    { title: "API" },
+    { title: "Networking" }
+
+];
+
+function getRandomWelcomeTopics(count = 4) {
+
+    const topics = [...welcomeTopics];
+
+    for (let i = topics.length - 1; i > 0; i--) {
+
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [topics[i], topics[j]] = [topics[j], topics[i]];
+
+    }
+
+    return topics.slice(0, count);
+
+}
+
 // Window load settings & localStorage setup (from your second screenshot)
+
+function showWelcomeCard() {
+
+    addMessage(
+        "bot",
+        `
+<div class="welcome-card">
+
+    <div class="welcome-title">
+        👋 Welcome to CortexFlowAI
+    </div>
+
+    <div class="welcome-subtitle">
+        AI assistant for programming, AI, technology & Pranav's portfolio.
+    </div>
+
+    <div class="welcome-small">
+        Start with one of these:
+    </div>
+
+    <div class="suggestion-container">
+
+       ${createSuggestionButtons(
+     getRandomWelcomeTopics(4)
+     )}
+
+    </div>
+
+</div>
+`
+    );
+
+}
 
 chatLauncher.addEventListener("click", () => {
 
@@ -830,6 +1518,11 @@ chatLauncher.addEventListener("click", () => {
     }
 
     chatWidget.style.display = "flex";
+    chatWidget.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+    chatBody.scrollTop = chatBody.scrollHeight;
+}, 50);
     chatOverlay.classList.add("active");
     chatLauncher.style.display = "none";
 
@@ -841,18 +1534,9 @@ chatLauncher.addEventListener("click", () => {
     chatWidget.style.opacity = "1";
     chatWidget.style.transform = "none"; // Remove popup centering
 
-    if (chatBody.children.length === 0) {
-        addMessage(
-            "bot",
-            formatBotText(
-`${getGreeting()} 👋
-
-👋 Welcome to CortexFlowAI!
-I'm here to answer your questions, explain concepts, assist with programming, and help you explore Pranav's portfolio.
-How can I assist you today?`
-            )
-        );
-    }
+if (chatBody.children.length === 0) {
+    showWelcomeCard();
+ }
 
 });
 
@@ -863,6 +1547,8 @@ closeChat.addEventListener("click", () => {
     chatLauncher.style.display = "flex";
     chatLauncher.style.opacity = "1";
     chatLauncher.style.pointerEvents = "auto";
+    document.body.style.overflow = "";
+    document.body.classList.remove("chat-open");
 });
 
 minimizeChat.addEventListener("click", () => {
@@ -872,6 +1558,8 @@ minimizeChat.addEventListener("click", () => {
     chatLauncher.style.display = "flex";
     chatLauncher.style.opacity = "1";
     chatLauncher.style.pointerEvents = "auto";
+    document.body.style.overflow = "";
+    document.body.classList.remove("chat-open");
 });
 
 resetChat.addEventListener("click", () => {
@@ -881,24 +1569,69 @@ resetChat.addEventListener("click", () => {
 
     localStorage.removeItem("chatHistory");
 
-    addMessage("bot",
-        "👋 Welcome to CortexFlowAI!<br><br>I'm here to answer your questions, explain concepts, assist with programming, and help you explore Pranav's portfolio.How can I assist you today?")
-
+    showWelcomeCard();
 });
+
+const loaderStatus = document.querySelector(".loader-status");
+
+const loaderMessages = [
+    "Initializing AI Engine...",
+    "Loading Knowledge Base...",
+    "Preparing Assistant..."
+];
+
+let loaderIndex = 0;
+
+const loaderInterval = setInterval(() => {
+
+    loaderIndex++;
+
+    if (loaderIndex < loaderMessages.length) {
+
+        loaderStatus.style.opacity = "0";
+
+        setTimeout(() => {
+
+            loaderStatus.textContent = loaderMessages[loaderIndex];
+
+            loaderStatus.style.opacity = "1";
+
+        }, 180);
+
+    }
+
+}, 700);
 
 window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.getElementById("loader").style.opacity = 0;
+
     setTimeout(() => {
-      document.getElementById("loader").remove();
-    }, 500);
-  }, 2000);
+
+        clearInterval(loaderInterval);
+
+        const loader = document.getElementById("loader");
+
+        loader.style.opacity = "0";
+
+        setTimeout(() => {
+
+            loader.remove();
+
+        }, 500);
+
+    }, 2000);
+
 });
 
-const savedchat = localStorage.getItem("chatHistory");
-if (savedchat) {
-  chatBody.innerHTML = savedchat;
-  chatBody.scrollTop = chatBody.scrollHeight;
+const savedChat = localStorage.getItem("chatHistory");
+
+if (savedChat) {
+
+    chatBody.innerHTML = savedChat;
+
+    requestAnimationFrame(() => {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+
 }
 
 chatOverlay.addEventListener("click", () => {
@@ -968,5 +1701,19 @@ submitEnquiry.addEventListener("click", async () => {
         alert("Something went wrong.");
 
     }
+
+});
+
+document.addEventListener("click", (e) => {
+
+    const card = e.target.closest(".suggestion-card");
+
+    if (!card) return;
+
+    const topic = card.dataset.topic;
+
+    chatInput.value = topic;
+
+    handleUserSendMessage();
 
 });

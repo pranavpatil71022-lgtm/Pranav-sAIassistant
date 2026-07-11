@@ -1121,4 +1121,238 @@ const technologyReplies = [
     reply: `Virtual Reality (VR) is a technology that creates a fully immersive digital environment using specialized headsets and controllers. Unlike Augmented Reality, VR completely replaces the real-world view with a computer-generated environment. VR is widely used in gaming, education, medical training, engineering simulations, military training, and virtual collaboration.`
 },
 
+{
+    id: 101,
+    title: "What is Python?",
+    category: "Programming",
+    keywords: [
+        "python",
+        "python language"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "Programming",
+        "AI",
+        "Machine Learning"
+    ],
+    reply: `Python is a high-level, interpreted programming language known for its simple syntax and readability. It is widely used in web development, artificial intelligence, machine learning, automation, data science, cybersecurity, and scripting. Python has a large ecosystem of libraries and is considered one of the best languages for beginners.`
+},
+
+{
+    id: 102,
+    title: "What is Java?",
+    category: "Programming",
+    keywords: [
+        "java",
+        "java language"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "OOP",
+        "Android Development",
+        "Programming"
+    ],
+    reply: `Java is a powerful object-oriented programming language designed to run on any platform using the Java Virtual Machine (JVM). It is widely used for enterprise software, Android app development, web applications, and backend systems due to its reliability, portability, and security.`
+},
+
+{
+    id: 103,
+    title: "What is JavaScript?",
+    category: "Programming",
+    keywords: [
+        "javascript",
+        "js",
+        "java script"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "HTML",
+        "CSS",
+        "Web Development"
+    ],
+    reply: `JavaScript is the programming language of the web. It enables websites to become interactive by handling user input, animations, dynamic content, and communication with servers. JavaScript is also used on the server side through Node.js, making it a full-stack programming language.`
+},
+
+{
+    id: 104,
+    title: "What is C?",
+    category: "Programming",
+    keywords: [
+        "c",
+        "c language"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "Programming",
+        "Operating Systems",
+        "Memory Management"
+    ],
+    reply: `C is one of the oldest and most influential programming languages. It provides low-level access to memory, making it highly efficient for developing operating systems, embedded systems, device drivers, and performance-critical applications.`
+},
+
+{
+    id: 105,
+    title: "What is C++?",
+    category: "Programming",
+    keywords: [
+        "c++",
+        "cpp",
+        "cplusplus"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "Object-Oriented Programming",
+        "Game Development",
+        "DSA"
+    ],
+    reply: `C++ is an extension of the C programming language that supports object-oriented programming, templates, and advanced memory management. It is commonly used in competitive programming, game development, high-performance applications, and system software.`
+},
+
+{
+    id: 106,
+    title: "What is C#?",
+    category: "Programming",
+    keywords: [
+        "c#",
+        "c sharp",
+        "csharp"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        ".NET",
+        "Unity",
+        "Programming"
+    ],
+    reply: `C# is a modern object-oriented programming language developed by Microsoft. It is mainly used for Windows applications, web development using ASP.NET, cloud services, and game development with the Unity game engine.`
+},
+
+{
+    id: 107,
+    title: "What is Go?",
+    category: "Programming",
+    keywords: [
+        "go",
+        "golang"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "Backend Development",
+        "Cloud Computing",
+        "Concurrency"
+    ],
+    reply: `Go, also known as Golang, is an open-source programming language developed by Google. It is designed for simplicity, speed, and concurrency, making it ideal for cloud computing, backend APIs, networking software, and distributed systems.`
+},
+
+{
+    id: 108,
+    title: "What is Rust?",
+    category: "Programming",
+    keywords: [
+        "rust",
+        "rust language"
+    ],
+    difficulty: "Intermediate",
+    estimatedReadTime: "2 min",
+    relatedTopics: [
+        "Memory Safety",
+        "Systems Programming",
+        "Performance"
+    ],
+    reply: `Rust is a modern systems programming language focused on memory safety, speed, and concurrency. It prevents many common programming errors without using a garbage collector, making it popular for operating systems, web services, and security-sensitive software.`
+},
+
+{
+    id: 109,
+    title: "What is PHP?",
+    category: "Programming",
+    keywords: [
+        "php",
+        "php language"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "Backend Development",
+        "Web Development",
+        "Laravel"
+    ],
+    reply: `PHP is a server-side scripting language designed for web development. It powers millions of websites and content management systems such as WordPress. PHP is commonly used to create dynamic websites, APIs, and backend services.`
+},
+
+{
+    id: 110,
+    title: "What is Swift?",
+    category: "Programming",
+    keywords: [
+        "swift",
+        "swift language"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "iOS Development",
+        "Apple",
+        "Mobile Development"
+    ],
+    reply: `Swift is Apple's modern programming language for developing applications on iOS, macOS, watchOS, and tvOS. It is designed to be fast, safe, and easy to read while supporting modern programming practices.`
+},
+
+{
+    id: 111,
+    title: "What is HTML?",
+    category: "Programming",
+    keywords: [
+        "html",
+        "hypertext markup language",
+        "what is html",
+        "html language",
+        "html basics",
+        "learn html"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "2 min",
+    relatedTopics: [
+        "CSS",
+        "JavaScript",
+        "Web Development"
+    ],
+    reply: `HTML (HyperText Markup Language) is the standard markup language used to create web pages and web applications. It defines the structure of a webpage using elements such as headings, paragraphs, images, links, tables, forms, and more.
+
+HTML works together with CSS and JavaScript:
+• HTML provides the structure.
+• CSS controls the design and layout.
+• JavaScript adds interactivity and dynamic behavior.
+
+Every website on the internet uses HTML as its foundation, making it one of the first languages beginners learn in web development.`
+},
+
+{
+    id: 112,
+    title: "What is Cybersecurity?",
+    category: "Technology",
+    keywords: [
+        "cybersecurity",
+        "cyber security",
+        "network security",
+        "cybersecurity",
+        "security",
+        "cyber"
+    ],
+    difficulty: "Beginner",
+    estimatedReadTime: "1 min",
+    relatedTopics: [
+        "Ethical Hacking",
+        "Networking",
+        "Linux"
+    ],
+    reply: `Cybersecurity is the practice of protecting computers, networks, applications, and data from cyber threats such as hacking, malware, phishing, and ransomware. It combines technologies, security policies, and best practices to keep digital systems secure and protect sensitive information.`
+},
+
 ];
