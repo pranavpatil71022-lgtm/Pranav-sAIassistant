@@ -50,6 +50,10 @@ const openEnquiry = document.getElementById('openEnquiry');
 const enquiryModal = document.getElementById('enquiryModal');
 const closeEnquiry = document.getElementById('closeEnquiry');
 const submitEnquiry = document.getElementById('submitEnquiry');
+const openContact = document.getElementById('openContact');
+const contactModal = document.getElementById('contactModal');
+const closeContact = document.getElementById('closeContact');
+const dismissContact = document.getElementById('dismissContact');
 const fullNameInput = document.getElementById('fullName');
 const mobileInput = document.getElementById('mobileNumber');
 const emailInput = document.getElementById('Email');
@@ -1644,6 +1648,32 @@ openEnquiry.addEventListener("click", () => {
 closeEnquiry.addEventListener("click", () => {
     enquiryModal.style.display = "none";
     document.body.style.overflow = "";
+});
+const closeContactModal = () => {
+    if (!contactModal.classList.contains("active")) {
+        return;
+    }
+    contactModal.classList.remove("active");
+    contactModal.classList.add("closing");
+    contactModal.setAttribute("aria-hidden", "true");
+    setTimeout(() => {
+        contactModal.classList.remove("closing");
+        document.body.style.overflow = "";
+    }, 360);
+};
+openContact.addEventListener("click", (event) => {
+    event.preventDefault();
+    contactModal.classList.remove("closing");
+    contactModal.classList.add("active");
+    contactModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+});
+closeContact.addEventListener("click", closeContactModal);
+dismissContact.addEventListener("click", closeContactModal);
+contactModal.addEventListener("click", (event) => {
+    if (event.target === contactModal) {
+        closeContactModal();
+    }
 });
 enquiryModal.addEventListener("click", (e) => {
     if (e.target === enquiryModal) {

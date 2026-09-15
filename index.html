@@ -6,6 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <title>CortexFlowAI — Intelligence in Motion</title>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" type="image/png" href="cortexflowai.logo.png">
@@ -76,16 +77,16 @@
         <h1>Pranav Patil</h1>
         <div class="role">Building AI-Powered Web Applications</div>
       </div>
-      <p class="tagline">Hi, I'm Pranav Patil, an aspiring Software Engineer from Maharashtra, India. I build modern web applications and     AI-powered projects. I'm currently developing CortexFlowAI, an intelligent assistant designed to provide fast and helpful responses.</p>
+      <p class="tagline">Hi, I'm Pranav Patil, a Cybersecurity Enthusiast and aspiring Software Engineer from Maharashtra, India. I explore cybersecurity, ethical hacking, and web security while also developing modern web applications and AI-powered projects. I'm currently developing CortexFlowAI, an intelligent assistant designed to provide fast and helpful responses.</p>
       <div class="socials">
-        <a href="https://github.com/pranavpatil71022-lgtm" aria-label="GitHub" target="_blank" rel="noopener noreferrer">🐙</a>
-        <a href="https://www.linkedin.com/in/pranav-g-patil-6230aa365?utm_source=share_via&utm_content=profile&utm_medium=member_android" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">in</a>
-        <a href="https://www.instagram.com/iampranav012/" aria-label="Instagram" target="_blank" rel="noopener noreferrer">📷</a>
-        <a href="mailto:pranavpatil71025@gmail.com" aria-label="Email">✉</a>
+        <a href="https://github.com/pranavpatil71022-lgtm" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+        <a href="https://www.linkedin.com/in/pranav-g-patil-6230aa365?utm_source=share_via&utm_content=profile&utm_medium=member_android" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+        <a href="https://www.instagram.com/pranav.xyz_/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+        <a href="mailto:pranavpatil71025@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope" aria-hidden="true"></i></a>
       </div>
       <div class="cta-row">
         <a href="#projects" class="btn-primary">View Projects →</a>
-        <a href="#contact" class="btn-ghost">Contact</a>
+        <a href="#contact" class="btn-ghost" id="openContact">Contact Pranav</a>
       </div>
     </div>
     <div class="avatar-wrap">
@@ -99,7 +100,7 @@
     <div class="about-grid">
       <div class="about-card">
         <h3><span class="icon-badge">👤</span> Who I Am</h3>
-        <p>Hi, I'm Pranav Ganesh Patil, an aspiring Software Engineer and passionate Web Developer from Maharashtra, India. I enjoy building modern, responsive websites and continuously learning new technologies. I'm currently strengthening my skills in HTML, CSS, JavaScript, C, C++, Git, and GitHub while working toward becoming a Full-Stack Developer. This portfolio showcases my projects, skills, and learning journey.</p>
+        <p>Hi, I'm Pranav Ganesh Patil, a Cybersecurity Enthusiast and aspiring Software Engineer from Maharashtra, India. I'm passionate about cybersecurity, ethical hacking, web security, and understanding how to build secure digital systems. I also have a strong interest in software and web development, where I enjoy building projects and exploring new technologies. I continuously strengthen my skills in cybersecurity, programming, and development. This portfolio showcases my projects, skills, and journey in cybersecurity and technology.</p>
       </div>
       <div class="about-card">
         <h3><span class="icon-badge">🚀</span> My Journey</h3>
@@ -200,6 +201,17 @@
     <label for="Email">Email</label>
     <input id="Email" name="email" type="email" placeholder="Enter your email(optional)">
     <button class="enquiry-submit" id="submitEnquiry" type="button">Submit</button>
+  </div>
+ </div>
+
+<div class="contact-modal" id="contactModal" aria-hidden="true">
+  <div class="contact-card" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <button class="contact-close" id="closeContact" type="button" aria-label="Close contact message">&times;</button>
+    <span class="contact-icon" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
+    <h3 id="contactTitle">Let’s Connect</h3>
+    <p>Feel free to reach out to me at:</p>
+    <a class="contact-email" href="mailto:pranavpatil71025@gmail.com">pranavpatil71025@gmail.com</a>
+    <button class="contact-dismiss" id="dismissContact" type="button">Close</button>
   </div>
  </div>
 
