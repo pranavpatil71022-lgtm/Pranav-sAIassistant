@@ -465,7 +465,12 @@ const BOT_AVATAR = `
 >
 `;
 
+function isChatNearBottom() {
+        return chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight < 96;
+}
+
 function addMessage(role, html){
+    const shouldScroll = role === "user" || isChatNearBottom();
   const row = document.createElement('div');
   row.className = 'msg-row ' + (role === 'user' ? 'user' : 'bot');
  const time = new Date().toLocaleTimeString([], {
@@ -499,7 +504,9 @@ row.innerHTML = `
 </div>
 `;
   chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
+    if (shouldScroll) {
+            chatBody.scrollTop = chatBody.scrollHeight;
+    }
   localStorage.setItem("chatHistory", chatBody.innerHTML);
   return row;
 }
@@ -648,9 +655,12 @@ function addTyping(){
 </div>
 `;
 
+    const shouldScroll = isChatNearBottom();
     chatBody.appendChild(row);
 
-    chatBody.scrollTop = chatBody.scrollHeight;
+    if (shouldScroll) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
 }
 
 function removeTyping(){
@@ -1894,6 +1904,11 @@ function resizeChatInput() {
 
 chatInput.addEventListener("input", resizeChatInput);
 chatInput.addEventListener('keydown', (e) => {
+    if (clearConfirm.classList.contains("active")) {
+        e.preventDefault();
+        return;
+    }
+
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
     handleUserSendMessage();
@@ -1924,6 +1939,60 @@ function getRandomWelcomeKnowledgeTopics() {
     );
 
     return selectedTopics;
+}
+
+function getKnowledgeTopicBadge(category) {
+    const categoryName = String(category || "Knowledge").trim();
+    const shortCategoryNames = {
+        "Operating Systems": "OS",
+        "Developer Tools": "DEV",
+        "Emerging Technology": "TECH",
+        "Cloud & Database": "CLOUD",
+        "Programming": "CODE",
+        "Artificial Intelligence": "AI",
+        "AI & Technology": "AI",
+        "AI / Technology": "AI",
+        "Cybersecurity": "SECURITY",
+        "Web Development": "WEB",
+        "Networking": "NET",
+        "Database": "DATABASE",
+        "Cloud Computing": "CLOUD"
+    };
+
+    if (shortCategoryNames[categoryName]) {
+        return shortCategoryNames[categoryName];
+    }
+
+    if (categoryName.length <= 12) {
+        return categoryName.toUpperCase();
+    }
+
+    const categoryLowercase = categoryName.toLowerCase();
+
+    if (categoryLowercase.includes("cloud")) {
+        return "CLOUD";
+    }
+
+    if (categoryLowercase.includes("security")) {
+        return "SECURITY";
+    }
+
+    if (categoryLowercase.includes("database")) {
+        return "DATABASE";
+    }
+
+    if (categoryLowercase.includes("program")) {
+        return "CODE";
+    }
+
+    const initials = categoryName
+        .split(/\s+/)
+        .map(word => word.replace(/[^a-z0-9]/gi, "")[0])
+        .filter(Boolean)
+        .join("")
+        .toUpperCase();
+
+    return initials.slice(0, 6) || "KB";
 }
 
 function showWelcomeCard() {
@@ -1960,7 +2029,7 @@ function showWelcomeCard() {
     <div class="welcome-prompt-grid">
         ${knowledgeTopics.map(topic => `
         <button class="welcome-prompt knowledge-prompt" type="button" data-knowledge-id="${topic.id}">
-            <span>KB</span> ${escapeHtml(topic.title)}
+            <span>${escapeHtml(getKnowledgeTopicBadge(topic.category))}</span> ${escapeHtml(topic.title)}
         </button>
         `).join("")}
     </div>
@@ -2049,6 +2118,7 @@ minimizeChat.addEventListener("click", () => {
 function closeClearConfirmation() {
     clearConfirm.classList.remove("active");
     clearConfirm.setAttribute("aria-hidden", "true");
+    resetChat.focus();
 }
 
 function clearCurrentChat() {
@@ -2065,12 +2135,25 @@ function clearCurrentChat() {
 resetChat.addEventListener("click", () => {
     clearConfirm.classList.add("active");
     clearConfirm.setAttribute("aria-hidden", "false");
+    setTimeout(() => confirmClearChat.focus(), 100);
 });
 
 cancelClearChat.addEventListener("click", closeClearConfirmation);
 confirmClearChat.addEventListener("click", clearCurrentChat);
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && clearConfirm.classList.contains("active")) {
+    if (!clearConfirm.classList.contains("active")) {
+        return;
+    }
+
+    if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        clearCurrentChat();
+        return;
+    }
+
+    if (e.key === "Escape") {
+        e.preventDefault();
         closeClearConfirmation();
     }
 });

@@ -577,6 +577,11 @@
   .profile-avatar-preview img,
   .user-profile-photo{
     object-fit:cover;
+    object-position:center;
+  }
+  .profile-avatar-preview{
+    overflow:hidden;
+    border-radius:50%;
   }
   .chat-widget.open .chat-header{
     background:linear-gradient(145deg, rgba(35,41,92,0.96), rgba(57,28,111,0.96));
@@ -605,56 +610,68 @@
   }
 
   .clear-confirm-card{
-    width:min(100%,340px);
-    padding:22px;
-    border:1px solid rgba(165,180,252,.25);
-    border-radius:18px;
-    background:linear-gradient(145deg,rgba(27,35,56,.98),rgba(12,18,32,.98));
-    box-shadow:0 24px 70px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.07);
+    width:min(100%,390px);
+    padding:28px 26px 24px;
+    border:1px solid rgba(165,180,252,.32);
+    border-radius:22px;
+    background:linear-gradient(145deg,rgba(30,38,68,.88),rgba(10,16,30,.94));
+    box-shadow:0 28px 90px rgba(0,0,0,.58),0 0 34px rgba(91,108,255,.12),inset 0 1px 0 rgba(255,255,255,.1);
+    backdrop-filter:blur(18px);
     text-align:center;
   }
 
   .clear-confirm-icon{
     display:grid;
     place-items:center;
-    width:40px;
-    height:40px;
-    margin:0 auto 12px;
-    border-radius:12px;
-    background:rgba(129,140,248,.16);
-    color:#c7d2fe;
-    font-size:22px;
+    width:50px;
+    height:50px;
+    margin:0 auto 16px;
+    border-radius:16px;
+    background:linear-gradient(135deg,rgba(129,140,248,.26),rgba(91,108,255,.12));
+    border:1px solid rgba(199,210,254,.2);
+    color:#dbeafe;
+    font-size:24px;
+    box-shadow:0 10px 28px rgba(91,108,255,.18);
   }
 
   .clear-confirm-card h3{
     margin:0;
     color:#fff;
-    font-size:18px;
+    font-size:21px;
+    letter-spacing:.01em;
   }
 
   .clear-confirm-card p{
-    margin:8px 0 18px;
+    margin:10px 0 24px;
     color:#aeb9d4;
-    font-size:13px;
-    line-height:1.5;
+    font-size:14px;
+    line-height:1.6;
   }
 
   .clear-confirm-actions{
     display:flex;
-    justify-content:flex-end;
-    gap:8px;
+    justify-content:center;
+    gap:10px;
   }
 
   .clear-cancel-btn,
   .clear-confirm-btn{
-    min-height:40px;
-    padding:0 13px;
+    min-height:44px;
+    flex:1;
+    padding:0 16px;
     border:1px solid rgba(165,180,252,.25);
     border-radius:9px;
     background:rgba(255,255,255,.05);
     color:#dbeafe;
     cursor:pointer;
     transition:transform .2s ease, background .2s ease, border-color .2s ease;
+  }
+
+  .clear-cancel-btn:focus-visible,
+  .clear-confirm-btn:focus-visible{
+    outline:2px solid #c7d2fe;
+    outline-offset:3px;
+    box-shadow:0 0 0 5px rgba(129,140,248,.16);
   }
 
   .clear-confirm-btn{
@@ -724,7 +741,7 @@
     background:#0f131d;
     letter-spacing:.2px;
     user-select:none;
-    flex-shrink:0;
+    flex:0 0 auto;
   }
   .chat-footer:hover{
     color:#cfd8ff;
@@ -733,8 +750,9 @@
 
 
  .chat-body{
-    flex:1;
-    min-height:0;
+   flex:1 1 0;
+   min-height:0;
+   min-width:0;
     overflow-y:auto;
     overflow-x:hidden;
     padding:20px;
@@ -746,6 +764,10 @@
     -webkit-overflow-scrolling:touch;
 
     overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    contain:layout;
+    isolation:isolate;
+    overflow-anchor:auto;
 
     
   }
@@ -895,6 +917,7 @@
   .typing-dots span{
     width:6px; height:6px; border-radius:50%;
     background:var(--muted);
+    box-shadow:0 0 10px rgba(165,180,252,.35);
     animation:blink 1.2s infinite ease-in-out;
   }
   .typing-dots span:nth-child(2){animation-delay:0.2s;}
@@ -921,7 +944,7 @@
 
     box-shadow:0 0 18px rgba(124,58,237,.12);
 
-    flex-shrink:0;
+    flex:0 0 auto;
 }
 
 #chatInput{
@@ -1566,6 +1589,7 @@
     flex-shrink:0;
 
     overflow:hidden;
+    isolation:isolate;
 
 }
 
@@ -1585,6 +1609,7 @@
     display:block;
     border-radius:50%;
     object-fit:cover;
+    object-position:center;
 
   }
 
@@ -1744,7 +1769,8 @@
 
     margin-bottom:10px;
 
-    animation:fadeStage .35s ease;
+    text-shadow:0 0 16px rgba(165,180,252,.25);
+    animation:thinkingPulse 2.2s ease-in-out infinite;
 
 }
 
@@ -2225,6 +2251,191 @@ body.chat-open .chat-body{
       Floating Particles
 ========================== */
 
+@media (max-width:480px){
+  .clear-confirm{padding:16px;}
+  .clear-confirm-card{padding:24px 18px 20px;}
+  .clear-confirm-actions{gap:8px;}
+  .clear-cancel-btn,
+  .clear-confirm-btn{padding:0 10px; font-size:13px;}
+}
+
+@media (max-width:600px){
+  .chat-header{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:calc(8px + env(safe-area-inset-top)) 8px 8px;
+    min-height:0;
+  }
+
+  .chat-header-left{
+    flex:1 1 auto;
+    min-width:0;
+    gap:7px;
+  }
+
+  .chat-header-left > div:last-child{
+    flex:1 1 auto;
+    min-width:0;
+  }
+
+  .bot-icon{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+  }
+
+  .chat-title{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.96rem;
+    line-height:1.15;
+  }
+
+  .chat-subtitle{
+    max-width:100%;
+    margin-top:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.68rem;
+    line-height:1.2;
+  }
+
+  .chat-status{
+    gap:5px;
+    margin-top:3px;
+    font-size:.68rem;
+    line-height:1.1;
+  }
+
+  .chat-status::before{
+    width:6px;
+    height:6px;
+    flex:0 0 6px;
+  }
+
+  .chat-header-right{
+    flex:0 0 auto;
+    gap:3px;
+  }
+
+  .chat-header-action,
+  .profile-avatar-control{
+    width:32px;
+    height:32px;
+    flex-shrink:0;
+  }
+
+  .chat-header-action{
+    border-radius:10px;
+    font-size:16px;
+  }
+
+  .profile-avatar-control{padding:2px;}
+
+  .chat-body{
+    padding:12px 8px;
+    gap:9px;
+  }
+
+  .msg-row,
+  .msg-row.user{
+    gap:6px;
+    margin-bottom:9px;
+  }
+
+  .msg-avatar{
+    width:35px;
+    height:35px;
+    min-width:35px;
+  }
+
+  .msg-bubble,
+  .msg-row.user .msg-bubble{
+    max-width:calc(100% - 41px);
+    min-width:0;
+    padding:10px 11px;
+    line-height:1.6;
+  }
+
+  .message-content{font-size:14px; line-height:1.7;}
+
+  .message-actions{
+    width:100%;
+    gap:4px;
+    margin-top:9px;
+  }
+
+  .msg-action{
+    min-height:36px;
+    padding:6px 8px;
+    font-size:11px;
+    white-space:nowrap;
+  }
+
+  .welcome-card{
+    padding:14px 12px;
+    border-radius:16px;
+  }
+
+  .welcome-title{font-size:20px; line-height:1.25;}
+  .welcome-subtitle{font-size:14px; line-height:1.5;}
+  .welcome-small{margin-top:15px; margin-bottom:10px;}
+
+  .profile-photo-prompt{
+    gap:10px;
+    margin:12px 0 14px;
+    padding:11px;
+  }
+
+  .profile-photo-actions{gap:7px; flex-wrap:wrap;}
+
+  .upload-photo-btn,
+  .remove-photo-btn{
+    min-height:36px;
+    padding:7px 10px;
+    white-space:nowrap;
+  }
+
+  .welcome-prompt-grid{gap:7px;}
+
+  .welcome-prompt{
+    min-height:46px;
+    padding:9px 9px;
+    gap:7px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+  }
+
+  .welcome-prompt span{flex:0 0 auto;}
+
+  .code-panel{max-width:100%;}
+  .code-panel pre{max-width:100%; overflow-x:auto; overscroll-behavior-x:contain;}
+
+  .chat-input-row{
+    gap:6px;
+    margin:7px 7px 6px;
+    padding:6px 7px;
+    min-height:58px;
+    border-radius:16px;
+  }
+
+  #chatInput{min-height:42px; height:42px; padding:9px 5px;}
+
+  .magic-btn{width:30px; min-width:30px;}
+  .attach-btn,
+  .send-btn{width:42px; height:42px;}
+
+  .chat-footer{
+    padding:7px 10px calc(8px + env(safe-area-inset-bottom));
+    font-size:11px;
+    line-height:1.35;
+  }
+}
+
 .loader-particles span:nth-child(1){left:5%;width:5px;height:5px;animation:particleFloat 8s infinite;}
 .loader-particles span:nth-child(2){left:15%;width:8px;height:8px;animation:particleFloat 11s infinite;}
 .loader-particles span:nth-child(3){left:28%;width:4px;height:4px;animation:particleFloat 9s infinite;}
@@ -2701,4 +2912,14 @@ body.chat-open .chat-body{
 @keyframes sendPulse{
   0%,100%{box-shadow:0 0 0 rgba(124,58,237,0);}
   50%{box-shadow:0 0 0 6px rgba(124,58,237,.16);}
+}
+
+@keyframes thinkingPulse{
+  0%,100%{opacity:.72;}
+  50%{opacity:1;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .thinking-stage,
+  .typing-dots span{animation:none;}
 }
