@@ -2073,9 +2073,9 @@ chatLauncher.addEventListener("click", () => {
         return;
     }
 
-    chatWidget.style.display = "flex";
-    chatWidget.style.display = "flex";
-    document.body.style.overflow = "hidden";
+   chatWidget.style.display = "flex";
+   document.body.style.overflow = "hidden";
+   document.body.classList.add("chat-open");
     setTimeout(() => {
     chatBody.scrollTop = chatBody.scrollHeight;
 }, 50);

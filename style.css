@@ -2592,11 +2592,6 @@ body.chat-open .chat-body{
     text-overflow:ellipsis;
   }
 
-  .chat-subtitle::after{
-    content:"AI Assistant";
-    font-size:11px;
-  }
-
   .chat-status{
     display:flex;
     align-items:center;
@@ -2927,24 +2922,26 @@ body.chat-open .chat-body{
     cursor:pointer;
   }
 
-  .mobile-menu-item:hover,
-  .mobile-menu-item:focus-visible{background:rgba(129,140,248,.16);}
+   .mobile-menu-item:hover,
+   .mobile-menu-item:focus-visible{background:rgba(129,140,248,.16);}
 
   .mobile-profile-panel{
-    position:absolute;
-    inset:0;
-    z-index:7;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding:76px 16px 20px;
-    box-sizing:border-box;
-    background:rgba(3,7,18,.32);
-    backdrop-filter:blur(3px);
-    -webkit-backdrop-filter:blur(3px);
+   position:absolute;
+   inset:0;
+   z-index:7;
+   display:none;
+   flex-direction:column;
+   align-items:center;
+   justify-content:flex-start;
+   padding:76px 16px 20px;
+   box-sizing:border-box;
+   background:rgba(3,7,18,.32);
+   backdrop-filter:blur(3px);
+   -webkit-backdrop-filter:blur(3px);
   }
-  .mobile-profile-panel.active{display:flex;}
+  .mobile-profile-panel.active{
+   display:flex;
+  }
 
   .mobile-profile-card{
     display:flex;
