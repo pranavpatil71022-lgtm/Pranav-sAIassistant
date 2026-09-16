@@ -2196,7 +2196,11 @@ mobileClearAction.addEventListener("click", () => {
     resetChat.click();
 });
 
-mobileProfileClose.addEventListener("click", closeMobileProfile);
+mobileProfileClose.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    closeMobileProfile();
+});
 mobileProfilePhoto.addEventListener("click", () => profilePhotoInput.click());
 mobileEditProfile.addEventListener("click", () => {
     mobileProfileEditor.classList.add("active");
