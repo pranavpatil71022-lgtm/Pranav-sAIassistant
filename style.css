@@ -2845,12 +2845,14 @@ body.chat-open .chat-body{
   .mobile-menu-item:hover,
   .mobile-menu-item:focus-visible{background:rgba(129,140,248,.16);}
 
-  .mobile-profile-panel{
+ .mobile-profile-panel{
     position:absolute;
     inset:0;
     z-index:7;
-    align-items:flex-start;
-    justify-content:flex-end;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content:flex-start;
     padding:76px 12px 0;
     background:rgba(3,7,18,.32);
     backdrop-filter:blur(3px);

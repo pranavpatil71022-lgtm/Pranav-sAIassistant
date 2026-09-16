@@ -1909,8 +1909,11 @@ chatInput.addEventListener('keydown', (e) => {
 
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-    handleUserSendMessage();
-  }
+
+        if (!chatInput.value.trim()) return;
+
+        handleUserSendMessage();
+    }
 });
 
 function getRandomWelcomeKnowledgeTopics() {
