@@ -752,27 +752,26 @@
     color:#cfd8ff;
     transition:.25s;
   }
-
-
- .chat-body{
+ 
+  .chat-body{
     flex:1 1 0;
     min-width:0;
     min-height:0;
+    height:0;
 
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:10px;
 
-    overflow-y:auto;
+    padding:18px 12px 24px;
+
+    overflow-y:scroll;
     overflow-x:hidden;
-
-    padding:20px;
-    background:#0f131d;
 
     -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:contain;
+    touch-action:pan-y;
 
-    /* Keep the message list in normal layout flow */
     contain:none;
     isolation:auto;
     overflow-anchor:none;
