@@ -2196,11 +2196,15 @@ mobileClearAction.addEventListener("click", () => {
     resetChat.click();
 });
 
-mobileProfileClose.addEventListener("click", (event) => {
+mobileProfileClose.addEventListener("pointerup", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    closeMobileProfile();
+
+    mobileProfilePanel.classList.remove("active");
+    mobileProfilePanel.setAttribute("aria-hidden", "true");
+    mobileProfileEditor.classList.remove("active");
 });
+
 mobileProfilePhoto.addEventListener("click", () => profilePhotoInput.click());
 mobileEditProfile.addEventListener("click", () => {
     mobileProfileEditor.classList.add("active");
@@ -2210,11 +2214,13 @@ mobileRemoveProfile.addEventListener("click", removeLocalProfile);
 mobileProfileEditor.addEventListener("submit", event => {
     event.preventDefault();
     const name = mobileProfileNameInput.value.trim();
+
     if (name) {
         localStorage.setItem(PROFILE_NAME_STORAGE_KEY, name);
     } else {
         localStorage.removeItem(PROFILE_NAME_STORAGE_KEY);
     }
+
     updateProfilePhotoUI();
     closeMobileProfile();
     dismissMobileProfileNotice();
@@ -2229,6 +2235,12 @@ document.addEventListener("click", event => {
     }
     if (mobileProfileNotice.classList.contains("active") && !event.target.closest("#mobileProfileNotice")) {
         dismissMobileProfileNotice();
+    }
+});
+
+mobileProfilePanel.addEventListener("pointerup", (event) => {
+    if (event.target === mobileProfilePanel) {
+        closeMobileProfile();
     }
 });
 
