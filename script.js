@@ -1209,6 +1209,19 @@ const cannedReplies = [
     pattern:/certification|certificate/i,
     aliases:["certification","certifications","certificate","course certificate"],
     reply:"Useful certifications include AWS Cloud Practitioner, Google Cloud, Microsoft Azure, Cisco, CompTIA, and other certifications relevant to your chosen technology stack."
+},
+
+{
+    pattern:/\bgit\b/i,
+    aliases:[
+        "git",
+        "what is git",
+        "explain git",
+        "tell me about git",
+        "git version control",
+        "git version control system"
+    ],
+    reply:"Git is a distributed version control system used to track changes in code and collaborate on software projects. It lets developers create commits, branches, merge changes, and work safely with tools like GitHub."
 }
 
 ];
@@ -1286,45 +1299,82 @@ function getMockReply(text) {
 }
   }
  
-  // Smart Technology Knowledge Base Search
- const message = text.toLowerCase();
+ // Smart Technology Knowledge Base Search
+const message = text
+    .toLowerCase()
+    .replace(/[^\w\s+#.-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 if (isActionRequest(message)) {
     return null;
 }
 
- let bestMatch = null;
- let highestScore = 0;
+const words = message.split(/\s+/);
+
+let bestMatch = null;
+let highestScore = 0;
 
 for (const item of technologyReplies) {
 
     let score = 0;
 
-    for (const keyword of item.keywords) {
+    const title = String(item.title || "")
+        .toLowerCase()
+        .replace(/[^\w\s+#.-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 
-        const key = keyword.toLowerCase();
+    const keywords = Array.isArray(item.keywords)
+        ? item.keywords.map(keyword =>
+            String(keyword)
+                .toLowerCase()
+                .replace(/[^\w\s+#.-]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim()
+        )
+        : [];
 
-        // Similarity only for short messages
-     if (message.length <= 40 && similarity(message, key) >= 0.9) {
-     score += 4;
-     }
+    // Exact title
+    if (message === title) {
+        score += 100;
+    }
 
-        // Exact keyword match gets higher score
-        if (message === key) {
-            score += 7;
+    // Title appears inside the question
+    if (title && message.includes(title)) {
+        score += 50;
+    }
+
+    // Individual title words
+    const titleWords = title.split(/\s+/).filter(Boolean);
+
+    for (const titleWord of titleWords) {
+        if (words.includes(titleWord)) {
+            score += 15;
+        }
+    }
+
+    // Keyword matching
+    for (const keyword of keywords) {
+
+        if (!keyword) continue;
+
+        // Exact keyword
+        if (message === keyword) {
+            score += 80;
         }
 
-        // Contains keyword
-        else if (message.includes(key)) {
-            score += 3;
+        // Keyword appears in question
+        else if (message.includes(keyword)) {
+            score += 30;
         }
 
-        // Individual word match
-        else {
-            const words = message.split(/\s+/);
+        // Individual keyword words
+        const keywordWords = keyword.split(/\s+/).filter(Boolean);
 
-            if (words.includes(key)) {
-                score += 2;
+        for (const keywordWord of keywordWords) {
+            if (words.includes(keywordWord)) {
+                score += 10;
             }
         }
     }
@@ -1335,36 +1385,37 @@ for (const item of technologyReplies) {
     }
 }
 
- // Only use the knowledge base if we're confident
- if (bestMatch && highestScore >= 6) {
+// Use the strongest Knowledge Base match
+if (bestMatch && highestScore >= 30) {
 
     return {
         title: bestMatch.title,
         category: bestMatch.category,
         difficulty: bestMatch.difficulty,
         estimatedReadTime: bestMatch.estimatedReadTime,
-        relatedTopics: bestMatch.relatedTopics,
+        relatedTopics: bestMatch.relatedTopics || [],
 
         reply: `
- 📚 ${bestMatch.title}
+📚 ${bestMatch.title}
 
- 📂 Category: ${bestMatch.category}
+📂 Category: ${bestMatch.category}
 
- ────────────────────
+────────────────────
 
- ${bestMatch.reply}
+${bestMatch.reply}
 
- ────────────────────
+────────────────────
 
- 💡 Related Topics
+💡 Related Topics
 
- ${bestMatch.relatedTopics.map(topic => `• ${topic}`).join("\n")}
- `
+${(bestMatch.relatedTopics || [])
+    .map(topic => `• ${topic}`)
+    .join("\n")}
+`
     };
+}
 
- }
-
-// No good knowledge-base match → use Gemini
+// No good Knowledge Base match → Gemini
 return null;
 }
 
@@ -1504,10 +1555,16 @@ function createLimitCard() {
 // Function to call your secure Vercel backend
 async function fetchAIReply(userMessage) {
 
+    const controller = new AbortController();
+
+    // Prevent the chat from getting stuck forever
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, 30000);
+
     try {
 
         const response = await fetch('/api/chat', {
-
             method: 'POST',
 
             headers: {
@@ -1517,28 +1574,35 @@ async function fetchAIReply(userMessage) {
             body: JSON.stringify({
                 message: userMessage,
                 systemPrompt: SYSTEM_PROMPT
-            })
+            }),
 
+            signal: controller.signal
         });
-const data = await response.json();
 
-if (!response.ok) {
-    throw new Error(data.reply || `HTTP ${response.status}`);
-}
+        const data = await response.json();
 
-return data.reply;
+        if (!response.ok) {
+            throw new Error(data.reply || `HTTP ${response.status}`);
+        }
 
-    } 
-     
-catch (error) {
+        return data.reply;
 
-    console.error("Gemini API Error:", error);
+    } catch (error) {
 
-    return {
-        error: true,
-        message: error.message
-    };
-}
+        console.error("Gemini API Error:", error);
+
+        return {
+            error: true,
+            message:
+                error.name === "AbortError"
+                    ? "The request took too long. Please try again."
+                    : error.message
+        };
+
+    } finally {
+
+        clearTimeout(timeoutId);
+    }
 }
 
 // Main function to handle sending messages
@@ -2129,12 +2193,33 @@ function closeClearConfirmation() {
 
 function clearCurrentChat() {
 
+    // Remove any stuck typing state
+    removeTyping();
+
+    // Reset conversation state
     history = [];
+    lastUserMessage = "";
+
+    // Reset spam protection state
+    warningCount = 0;
+    lastMessage = "";
+    repeatCount = 0;
+
+    // Re-enable chat input
+    chatInput.disabled = false;
+
+    // Clear visible messages
     chatBody.innerHTML = "";
 
+    // Remove saved chat history
     localStorage.removeItem("chatHistory");
 
+    // Show fresh welcome card
     showWelcomeCard();
+
+    // Restore send button state
+    updateSendButtonState();
+
     closeClearConfirmation();
 }
 
