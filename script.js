@@ -1972,7 +1972,7 @@ responseInProgress = false;
 sendBtn.addEventListener('click', handleUserSendMessage);
 function updateSendButtonState() {
     const isBusy = Boolean(document.getElementById("typingRow"));
-    sendBtn.disabled = !chatInput.value.trim() || isBusy || chatInput.disabled;
+    sendBtn.disabled = !chatInput.value.trim() || isBusy;
 }
 
 function resizeChatInput() {
