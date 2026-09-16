@@ -522,7 +522,7 @@ function isChatNearBottom() {
 }
 
 function addMessage(role, html){
-    const shouldScroll = role === "user" || isChatNearBottom();
+    const shouldScroll = role === "user" || role === "bot";
   const row = document.createElement('div');
   row.className = 'msg-row ' + (role === 'user' ? 'user' : 'bot');
  const time = new Date().toLocaleTimeString([], {
@@ -715,12 +715,9 @@ function addTyping(){
 </div>
 `;
 
-    const shouldScroll = isChatNearBottom();
-    chatBody.appendChild(row);
+   chatBody.appendChild(row);
 
-    if (shouldScroll) {
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
+   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
 function removeTyping(){
@@ -2128,54 +2125,53 @@ function getKnowledgeTopicBadge(category) {
 }
 
 function showWelcomeCard() {
-    const knowledgeTopics = getRandomWelcomeKnowledgeTopics();
+    const knowledgeTopics = getRandomWelcomeKnowledgeTopics().slice(0, 3);
+    const profileName = getSavedProfileName();
+    const displayName = profileName ? `, ${escapeHtml(profileName)}` : "";
 
     addMessage(
         "bot",
         `
-<div class="welcome-card">
+        <div class="welcome-card">
 
-    <div class="mobile-welcome-greeting">
-        ${escapeHtml(getGreeting())} 👋
-    </div>
+            <div class="welcome-logo">
+                <img src="cortexflowai.logo.png" alt="CortexFlowAI">
+            </div>
 
-    <div class="welcome-title">
-        👋 Welcome to CortexFlowAI
-    </div>
+            <div class="welcome-greeting">
+                Welcome${displayName} 👋
+            </div>
 
-    <div class="welcome-subtitle">
-        AI assistant for programming, AI, technology & Pranav's portfolio.
-    </div>
+            <div class="welcome-title">
+                How can I assist you?
+            </div>
 
-    <div class="welcome-small">
-        Start with one of these:
-    </div>
+            <div class="welcome-subtitle">
+                I'm CortexFlowAI — your AI assistant for programming,
+                technology, AI and Pranav's portfolio.
+            </div>
 
-    <div class="profile-photo-prompt" id="profilePhotoPrompt">
-        <div class="profile-photo-prompt-copy">
-            <strong>Make this chat yours</strong>
-            <span class="profile-photo-copy">Personalize your chat with a profile photo. It stays on this device only.</span>
+            <div class="welcome-small">
+                Try one of these:
+            </div>
+
+            <div class="welcome-prompt-grid">
+                ${knowledgeTopics.map(topic => `
+                    <button
+                        class="welcome-prompt knowledge-prompt"
+                        type="button"
+                        data-knowledge-id="${topic.id}">
+                        <strong>${escapeHtml(topic.title)}</strong>
+                        <span>${escapeHtml(topic.category || "Technology")}</span>
+                    </button>
+                `).join("")}
+            </div>
+
         </div>
-        <div class="profile-photo-actions">
-            <button class="upload-photo-btn" type="button">Upload Photo</button>
-            <button class="remove-photo-btn" type="button" hidden>Remove</button>
-        </div>
-    </div>
-
-    <div class="welcome-prompt-grid">
-        ${knowledgeTopics.map(topic => `
-        <button class="welcome-prompt knowledge-prompt" type="button" data-knowledge-id="${topic.id}">
-            <span>${escapeHtml(getKnowledgeTopicBadge(topic.category))}</span> ${escapeHtml(topic.title)}
-        </button>
-        `).join("")}
-    </div>
-
-</div>
-`
+        `
     );
 
     updateProfilePhotoUI();
-
 }
 
 function handleKnowledgeTopicClick(topicId) {
