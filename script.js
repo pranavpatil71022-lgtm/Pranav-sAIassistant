@@ -1805,31 +1805,24 @@ async function handleUserSendMessage() {
   // Check local canned responses first
  
   // Check local knowledge base first
-    const exactReply = shouldUseGemini ? null : technologyReplies.find(item => {
-
+    const exactReply = shouldUseGemini ? null : 
+    technologyReplies.find(item => {
     const cleanTitle = item.title
         .toLowerCase()
         .replace(/[^\w\s+#]/g, "")
         .trim();
 
     return cleanTitle === cleanMessage;
-
-});
+    });
 
 if (exactReply) {
-
     addTyping();
 
     setTimeout(() => {
-
-        addMessage(
-            "bot",
-            formatBotText(exactReply.reply)
-        );
-
-        removeTyping();
-        responseInProgress = false;
-
+     addMessage("bot",
+     formatBotText(exactReply.reply));
+     removeTyping();
+     responseInProgress = false;
     }, 900);
 
     return;
@@ -1902,6 +1895,7 @@ if (isRateLimited()) {
         createLimitCard()
     );
 
+    responseInProgress = false;
     return;
 }
 
@@ -1909,50 +1903,52 @@ if (isRateLimited()) {
 addTyping();
 
 const aiReply = await fetchAIReply(messageText);
-
 console.log("Gemini Reply:", aiReply);
 
- removeTyping();
-
 if (!aiReply) {
+    removeTyping();
+    responseInProgress = false;
     return;
 }
+
+removeTyping();
 
 if (aiReply.error) {
 
     addMessage(
-    "bot",
-    `
-<div class="ai-error-card">
+        "bot",
+        `
+        <div class="ai-error-card">
 
-    <div class="ai-error-icon">
-        ⚠️
-    </div>
+            <div class="ai-error-icon">
+                ⚠️
+            </div>
 
-    <div class="ai-error-title">
-        Something went wrong
-    </div>
+            <div class="ai-error-title">
+                Something went wrong
+            </div>
 
-    <div class="ai-error-text">
+            <div class="ai-error-text">
 
-        Please try again in a moment.
+                Please try again in a moment.
 
-        <br><br>
+                <br><br>
 
-        You can:
+                You can:
 
-        <ul>
-            <li>🔄 Try again in a few seconds</li>
-            <li>✏️ Rephrase your question</li>
-            <li>🌐 Check your internet connection</li>
-        </ul>
+                <ul>
+                    <li>🔄 Try again in a few seconds</li>
+                    <li>✏️ Rephrase your question</li>
+                    <li>🌐 Check your internet connection</li>
+                </ul>
 
-    </div>
+            </div>
 
-</div>
-`
-);
+        </div>
+        `
+    );
 
+    responseInProgress = false;
     return;
 }
 
@@ -1960,6 +1956,8 @@ addMessage(
     "bot",
     formatBotText(aiReply)
 );
+
+responseInProgress = false;
 
 }
 
@@ -2124,6 +2122,13 @@ function showWelcomeCard() {
 }
 
 function handleKnowledgeTopicClick(topicId) {
+
+    if (responseInProgress) {
+    return;
+    }
+
+    responseInProgress = true;
+
     const topic = technologyReplies.find(item => String(item.id) === String(topicId));
 
     if (!topic || !checkSpamProtection(topic.title)) {
@@ -2136,8 +2141,9 @@ function handleKnowledgeTopicClick(topicId) {
     addTyping();
 
     setTimeout(() => {
-        removeTyping();
-        addMessage("bot", formatBotText(topic.reply));
+    addMessage("bot", formatBotText(topic.reply));
+    removeTyping();
+    responseInProgress = false;
     }, 900);
 
 }
