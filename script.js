@@ -1755,17 +1755,31 @@ function checkSpamProtection(messageText) {
     return true;
 }
 
+let responseInProgress = false;
+
 async function handleUserSendMessage() {
+ if (responseInProgress) {
+ return;
+    }
+
+    responseInProgress = true;
+
+
   const messageText = chatInput.value.trim();
   const cleanMessage = messageText
     .toLowerCase()
     .replace(/[^\w\s+#]/g, "")
     .trim();
-  if (!messageText) return;
 
-  if (!checkSpamProtection(messageText)) {
+  if (!messageText) {
+    responseInProgress = false;
     return;
- }
+   }
+
+ if (!checkSpamProtection(messageText)) {
+    responseInProgress = false;
+    return;
+  }
   
 
   // Clear input and display user message in the UI
@@ -1774,16 +1788,17 @@ async function handleUserSendMessage() {
   lastUserMessage = messageText;
     const mathReply = tryCalculateBasicMath(messageText);
 
-    if (mathReply !== null) {
-        addTyping();
+   if (mathReply !== null) {
+    addTyping();
 
-        setTimeout(() => {
-                removeTyping();
-                addMessage("bot", formatBotText(mathReply));
-        }, 700);
+    setTimeout(() => {
+        addMessage("bot", formatBotText(mathReply));
+        removeTyping();
+        responseInProgress = false;
+    }, 700);
 
-        return;
-    }
+    return;
+  }
 
     const shouldUseGemini = isActionRequest(messageText);
 
@@ -1807,17 +1822,17 @@ if (exactReply) {
 
     setTimeout(() => {
 
-        removeTyping();
-
         addMessage(
             "bot",
             formatBotText(exactReply.reply)
         );
 
+        removeTyping();
+        responseInProgress = false;
+
     }, 900);
 
     return;
-
 }
  const localReply = shouldUseGemini ? null : getMockReply(messageText);
 
@@ -1829,12 +1844,10 @@ if (localReply !== null) {
 
     addTyping();
 
-    setTimeout(() => {
-
-        removeTyping();
-
-        addMessage("bot", formattedReply);
-
+   setTimeout(() => {
+    addMessage("bot", formattedReply);
+    removeTyping();
+    responseInProgress = false;
     }, thinkingTime);
 
     return;
@@ -1855,28 +1868,27 @@ if (suggestions.length > 0) {
 
     setTimeout(() => {
 
+    addMessage(
+        'bot',
+        `
+        <div class="suggestion-title-box">
 
-removeTyping();
+        🤔 I couldn't find an exact answer.
 
-     
- addMessage(
- 'bot',
- `
- <div class="suggestion-title-box">
+        <br><br>
 
- 🤔 I couldn't find an exact answer.
+        📚 Here are some related topics you can explore.
 
-<br><br>
- 
- 📚 Here are some related topics you can explore.
+        </div>
 
- </div>
+        ${createSuggestionButtons(suggestions)}
+        `
+    );
 
- ${createSuggestionButtons(suggestions)}
- `
-);
+    removeTyping();
+    responseInProgress = false;
 
-    }, 1800);
+   }, 1800);
 
     return;
 }
