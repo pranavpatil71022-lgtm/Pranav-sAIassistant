@@ -557,9 +557,17 @@ row.innerHTML = `
 `;
   chatBody.appendChild(row);
     if (shouldScroll) {
-            chatBody.scrollTop = chatBody.scrollHeight;
+        chatBody.scrollTop = chatBody.scrollHeight;
     }
-  localStorage.setItem("chatHistory", chatBody.innerHTML);
+
+   const historySnapshot = chatBody.cloneNode(true);
+
+   historySnapshot.querySelectorAll("#typingRow").forEach((row) => {
+   row.remove();
+   });
+
+  localStorage.setItem("chatHistory",
+  historySnapshot.innerHTML);
   return row;
 }
 
@@ -1889,7 +1897,6 @@ if (suggestions.length > 0) {
 
 // Limit only Gemini requests
 if (isRateLimited()) {
-
     addMessage(
         "bot",
         createLimitCard()
@@ -2132,7 +2139,8 @@ function handleKnowledgeTopicClick(topicId) {
     const topic = technologyReplies.find(item => String(item.id) === String(topicId));
 
     if (!topic || !checkSpamProtection(topic.title)) {
-        return;
+    responseInProgress = false;
+    return;
     }
 
     chatInput.value = "";
@@ -2423,31 +2431,38 @@ window.addEventListener("load", () => {
 const savedChat = localStorage.getItem("chatHistory");
 let restoredChat = savedChat;
 
-if (savedChat && savedChat.includes("welcome-card")) {
-    const legacyChat = document.createElement("div");
+if (savedChat && savedChat.trim()) {
+    const restoredContainer = document.createElement("div");
+    restoredContainer.innerHTML = savedChat;
 
-    legacyChat.innerHTML = savedChat;
-    legacyChat.querySelectorAll(".welcome-card").forEach((card) => {
-        card.closest(".msg-row")?.remove();
+    // Keep the welcome card as part of the conversation.
+    // Remove only temporary thinking/loading messages.
+    restoredContainer.querySelectorAll("#typingRow").forEach((row) => {
+        row.remove();
     });
 
-    restoredChat = legacyChat.innerHTML;
+    restoredChat = restoredContainer.innerHTML;
 
     if (restoredChat.trim()) {
         localStorage.setItem("chatHistory", restoredChat);
-    } else {
-        localStorage.removeItem("chatHistory");
     }
 }
 
 if (restoredChat && restoredChat.trim()) {
 
-    chatBody.innerHTML = restoredChat;
+    const restoredContainer = document.createElement("div");
+    restoredContainer.innerHTML = restoredChat;
+
+    // Never restore a temporary thinking/loading message
+    restoredContainer.querySelectorAll("#typingRow").forEach((row) => {
+        row.remove();
+    });
+
+    chatBody.innerHTML = restoredContainer.innerHTML;
 
     requestAnimationFrame(() => {
         chatBody.scrollTop = chatBody.scrollHeight;
     });
-
 }
 
 updateProfilePhotoUI();
