@@ -1233,52 +1233,6 @@ const cannedReplies = [
     reply:"Git is a distributed version control system used to track changes in code and collaborate on software projects. It lets developers create commits, branches, merge changes, and work safely with tools like GitHub."
 },
 
-{
-    pattern: /\b(python|py)\b.*\b(calculator|calc)\b|\b(calculator|calc)\b.*\b(python|py)\b/i,
-    aliases: [
-        "python calculator",
-        "python calculator code",
-        "give me python calculator code",
-        "calculator in python",
-        "write python calculator"
-    ],
-    reply: `Here is a simple Python calculator:
-
-\`\`\`python
-def calculator():
-    print("Simple Python Calculator")
-    print("1. Addition")
-    print("2. Subtraction")
-    print("3. Multiplication")
-    print("4. Division")
-
-    choice = input("Enter your choice (1-4): ")
-
-    num1 = float(input("Enter first number: "))
-    num2 = float(input("Enter second number: "))
-
-    if choice == "1":
-        result = num1 + num2
-    elif choice == "2":
-        result = num1 - num2
-    elif choice == "3":
-        result = num1 * num2
-    elif choice == "4":
-        if num2 == 0:
-            print("Cannot divide by zero.")
-            return
-        result = num1 / num2
-    else:
-        print("Invalid choice.")
-        return
-
-    print("Result:", result)
-
-
-calculator()
-\`\`\``
-},
-
 ];
 
 
@@ -1812,6 +1766,122 @@ function checkSpamProtection(messageText) {
 
 let responseInProgress = false;
 
+function isPortfolioProjectRequest(message) {
+    const text = message.toLowerCase();
+
+    return (
+        /\b(show|see|list|tell me about|what are|which are)\b.*\b(projects?|work)\b/i.test(text) ||
+        /\b(pranav'?s|my|your)\b.*\bprojects?\b/i.test(text) ||
+        /\bprojects?\b.*\b(pranav|portfolio)\b/i.test(text)
+    );
+}
+
+
+function createProjectCards() {
+    return `
+        <div class="project-response">
+
+            <div class="project-response-heading">
+                <span class="project-response-icon">🚀</span>
+                <div>
+                    <strong>Pranav's Projects</strong>
+                    <span>Explore some of the work behind CortexFlowAI.</span>
+                </div>
+            </div>
+
+            <div class="project-card-grid">
+
+                <article class="chat-project-card">
+                    <div class="chat-project-icon">🤖</div>
+
+                    <div class="chat-project-content">
+                        <div class="chat-project-title">
+                            CortexFlowAI
+                        </div>
+
+                        <p>
+                            An AI-powered assistant for technology,
+                            programming and portfolio exploration.
+                        </p>
+
+                        <div class="chat-project-tags">
+                            <span>AI</span>
+                            <span>JavaScript</span>
+                            <span>Web</span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="chat-project-btn"
+                            data-project-target="projects">
+                            Explore project →
+                        </button>
+                    </div>
+                </article>
+
+
+                <article class="chat-project-card">
+                    <div class="chat-project-icon">📱</div>
+
+                    <div class="chat-project-content">
+                        <div class="chat-project-title">
+                            Portfolio Website
+                        </div>
+
+                        <p>
+                            A responsive personal portfolio showcasing
+                            skills, projects and development journey.
+                        </p>
+
+                        <div class="chat-project-tags">
+                            <span>HTML</span>
+                            <span>CSS</span>
+                            <span>JavaScript</span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="chat-project-btn"
+                            data-project-target="projects">
+                            Explore project →
+                        </button>
+                    </div>
+                </article>
+
+
+                <article class="chat-project-card">
+                    <div class="chat-project-icon">🛡️</div>
+
+                    <div class="chat-project-content">
+                        <div class="chat-project-title">
+                            Cybersecurity Project
+                        </div>
+
+                        <p>
+                            A hands-on project exploring web security,
+                            vulnerabilities, networking and secure development.
+                        </p>
+
+                        <div class="chat-project-tags">
+                            <span>Security</span>
+                            <span>Web</span>
+                            <span>Linux</span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="chat-project-btn"
+                            data-project-target="projects">
+                            Explore project →
+                        </button>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    `;
+}
+
 async function handleUserSendMessage() {
  if (responseInProgress) {
  return;
@@ -1869,6 +1939,19 @@ async function handleUserSendMessage() {
 
     return cleanTitle === cleanMessage;
     });
+
+
+    if (!shouldUseGemini && isPortfolioProjectRequest(messageText)) {
+    addTyping();
+
+    setTimeout(() => {
+        addMessage("bot", createProjectCards());
+        removeTyping();
+        responseInProgress = false;
+    }, 700);
+
+    return;
+}
 
 if (exactReply) {
     addTyping();
@@ -2129,6 +2212,20 @@ function showWelcomeCard() {
     const profileName = getSavedProfileName();
     const displayName = profileName ? `, ${escapeHtml(profileName)}` : "";
 
+    const currentHour = new Date().getHours();
+
+    let timeGreeting;
+
+    if (currentHour >= 5 && currentHour < 12) {
+        timeGreeting = "Good morning";
+    } else if (currentHour >= 12 && currentHour < 17) {
+        timeGreeting = "Good afternoon";
+    } else if (currentHour >= 17 && currentHour < 21) {
+        timeGreeting = "Good evening";
+    } else {
+        timeGreeting = "Good night";
+    }
+
     addMessage(
         "bot",
         `
@@ -2139,7 +2236,7 @@ function showWelcomeCard() {
             </div>
 
             <div class="welcome-greeting">
-                Welcome${displayName} 👋
+                ${timeGreeting}${displayName} 👋
             </div>
 
             <div class="welcome-title">
@@ -2379,9 +2476,35 @@ mobileProfileEditor.addEventListener("submit", event => {
     }
 
     updateProfilePhotoUI();
-    closeMobileProfile();
-    dismissMobileProfileNotice();
-});
+
+   const welcomeGreeting = document.querySelector(".welcome-card .welcome-greeting");
+
+  if (welcomeGreeting) {
+    const savedName = getSavedProfileName();
+    const displayName = savedName
+        ? `, ${escapeHtml(savedName)}`
+        : "";
+
+    const currentHour = new Date().getHours();
+
+    let timeGreeting;
+
+    if (currentHour >= 5 && currentHour < 12) {
+        timeGreeting = "Good morning";
+    } else if (currentHour >= 12 && currentHour < 17) {
+        timeGreeting = "Good afternoon";
+    } else if (currentHour >= 17 && currentHour < 21) {
+        timeGreeting = "Good evening";
+    } else {
+        timeGreeting = "Good night";
+    }
+
+    welcomeGreeting.innerHTML = `${timeGreeting}${displayName} 👋`;
+  }
+
+  closeMobileProfile();
+  dismissMobileProfileNotice();
+  });
 
 document.addEventListener("click", event => {
     if (!event.target.closest(".chat-header-right")) {
@@ -2612,6 +2735,25 @@ submitEnquiry.addEventListener("click", async () => {
 });
 
 document.addEventListener("click", (e) => {
+
+    if (e.target.closest(".chat-project-btn")) {
+    const button = e.target.closest(".chat-project-btn");
+    const targetId = button.dataset.projectTarget;
+    const target = document.getElementById(targetId);
+
+    if (target) {
+        closeChat.click();
+
+        setTimeout(() => {
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 150);
+    }
+
+    return;
+  }
 
     const knowledgePrompt = e.target.closest(".knowledge-prompt");
 
