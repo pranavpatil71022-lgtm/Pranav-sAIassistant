@@ -7023,3 +7023,107 @@ body.chat-open .chat-body{
         letter-spacing:-.7px !important;
     }
 }
+
+/* ===== MOBILE SUGGESTION CARD POLISH ===== */
+
+@media (max-width:600px){
+
+    .welcome-prompt-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        gap:8px !important;
+    }
+
+    .welcome-prompt{
+        min-width:0 !important;
+        min-height:84px !important;
+        padding:12px 10px !important;
+        border-radius:14px !important;
+        gap:6px !important;
+    }
+
+    .welcome-prompt strong{
+        display:-webkit-box !important;
+        -webkit-line-clamp:2 !important;
+        -webkit-box-orient:vertical !important;
+        overflow:hidden !important;
+
+        font-size:12px !important;
+        line-height:1.35 !important;
+    }
+
+    .welcome-prompt span{
+        display:block !important;
+        max-width:100% !important;
+
+        font-size:9px !important;
+        line-height:1.3 !important;
+
+        white-space:nowrap !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+    }
+}
+
+/* ===== FORCE PROFILE PHOTO TO CIRCLE ===== */
+
+.profile-avatar-preview,
+.profile-avatar-preview img,
+.user-profile-photo{
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+
+    border-radius:50% !important;
+
+    object-fit:cover !important;
+    object-position:center !important;
+
+    overflow:hidden !important;
+}
+
+.profile-avatar-preview{
+    border-radius:50% !important;
+    overflow:hidden !important;
+}
+
+/* =========================================================
+   MOBILE CHAT SCROLL — FINAL POLISH
+   ========================================================= */
+
+@media (max-width:600px){
+
+    .chat-body{
+        flex:1 1 0 !important;
+        min-height:0 !important;
+        height:0 !important;
+
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+
+        touch-action:pan-y !important;
+        -webkit-overflow-scrolling:touch !important;
+
+        overscroll-behavior-y:contain !important;
+
+        scroll-behavior:smooth !important;
+
+        padding-bottom:18px !important;
+    }
+
+    .chat-body > .msg-row{
+        flex:0 0 auto !important;
+        min-height:fit-content !important;
+    }
+
+    .msg-row.bot,
+    .msg-row.user{
+        flex:0 0 auto !important;
+        min-height:fit-content !important;
+    }
+
+    .msg-row.bot .msg-bubble,
+    .msg-row.user .msg-bubble{
+        min-height:0 !important;
+    }
+}
