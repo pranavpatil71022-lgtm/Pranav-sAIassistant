@@ -115,6 +115,21 @@ const fullNameInput = document.getElementById('fullName');
 const mobileInput = document.getElementById('mobileNumber');
 const emailInput = document.getElementById('Email');
 const profilePhotoInput = document.getElementById('profilePhotoInput');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const mobileChatMenu = document.getElementById('mobileChatMenu');
+const mobileProfileAction = document.getElementById('mobileProfileAction');
+const mobileRefreshAction = document.getElementById('mobileRefreshAction');
+const mobileClearAction = document.getElementById('mobileClearAction');
+const mobileProfilePanel = document.getElementById('mobileProfilePanel');
+const mobileProfileClose = document.getElementById('mobileProfileClose');
+const mobileProfileName = document.getElementById('mobileProfileName');
+const mobileProfileStatus = document.getElementById('mobileProfileStatus');
+const mobileEditProfile = document.getElementById('mobileEditProfile');
+const mobileRemoveProfile = document.getElementById('mobileRemoveProfile');
+const mobileProfileEditor = document.getElementById('mobileProfileEditor');
+const mobileProfileNameInput = document.getElementById('mobileProfileNameInput');
+const mobileProfilePhoto = document.getElementById('mobileProfilePhoto');
+const mobileProfileNotice = document.getElementById('mobileProfileNotice');
 let history = [];
 let lastUserMessage = "";
 
@@ -340,10 +355,20 @@ fill="white"/>
 `;
 
 const PROFILE_PHOTO_STORAGE_KEY = "cortexflowaiProfilePhoto";
+const PROFILE_NAME_STORAGE_KEY = "cortexflowaiProfileName";
+const PROFILE_NOTICE_DISMISSED_KEY = "cortexflowaiProfileNoticeDismissed";
 
 function getSavedProfilePhoto() {
     try {
         return localStorage.getItem(PROFILE_PHOTO_STORAGE_KEY) || "";
+    } catch {
+        return "";
+    }
+}
+
+function getSavedProfileName() {
+    try {
+        return localStorage.getItem(PROFILE_NAME_STORAGE_KEY) || "";
     } catch {
         return "";
     }
@@ -371,11 +396,31 @@ function getUserAvatarMarkup() {
 
 function updateProfilePhotoUI() {
     const photo = getSavedProfilePhoto();
+    const profileName = getSavedProfileName();
     const avatarMarkup = getUserAvatarMarkup();
     const preview = document.getElementById("profileAvatarPreview");
+    const mobilePreview = document.getElementById("mobileProfileAvatarPreview");
 
     if (preview) {
         preview.innerHTML = avatarMarkup;
+    }
+
+    if (mobilePreview) {
+        mobilePreview.innerHTML = avatarMarkup;
+    }
+
+    if (mobileProfileName) {
+        mobileProfileName.textContent = profileName || "Your profile";
+    }
+
+    if (mobileProfileStatus) {
+        mobileProfileStatus.textContent = photo || profileName
+            ? "Your profile is saved on this device."
+            : "Add a name and photo to personalize your chat.";
+    }
+
+    if (mobileProfileNameInput && document.activeElement !== mobileProfileNameInput) {
+        mobileProfileNameInput.value = profileName;
     }
 
     document.querySelectorAll(".msg-row.user .msg-avatar").forEach(avatar => {
@@ -424,6 +469,13 @@ function showProfilePhotoMessage(message) {
 function removeProfilePhoto() {
     localStorage.removeItem(PROFILE_PHOTO_STORAGE_KEY);
     updateProfilePhotoUI();
+}
+
+function removeLocalProfile() {
+    localStorage.removeItem(PROFILE_PHOTO_STORAGE_KEY);
+    localStorage.removeItem(PROFILE_NAME_STORAGE_KEY);
+    updateProfilePhotoUI();
+    closeMobileProfile();
 }
 
 profilePhotoInput.addEventListener("change", () => {
@@ -515,7 +567,7 @@ document.addEventListener("click", (e) =>{
 
  // Suggestion buttons
 
-    if (e.target.closest(".profile-avatar-control, .upload-photo-btn")) {
+    if (e.target.closest(".upload-photo-btn")) {
         profilePhotoInput.click();
         return;
     }
@@ -1358,51 +1410,6 @@ return shuffled.slice(0, 3);
 
 }
 
-function getRandomKnowledgeTopics(count = 4) {
-
-    const shuffled = [...technologyReplies]
-        .sort(() => Math.random() - 0.5);
-
-    return shuffled.slice(0, count);
-
-}
-
-function createLimitCard() {
-
-    const topics = getRandomKnowledgeTopics();
-
-    return `
-        <div class="ai-limit-card">
-
-            <div class="limit-icon">⚠️</div>
-
-            <div class="limit-title">
-                AI Usage Limit Reached
-            </div>
-
-            <div class="limit-description">
-
-               You've reached the AI usage limit.
-
-                You can ask up to
-                <strong>5 AI-powered questions</strong>
-                every <strong>30 minutes</strong>.
-
-                Knowledge Base topics and portfolio questions remain available.
-
-                <br><br>
-
-                📚 While you wait, explore these topics:
-
-            </div>
-
-            ${createSuggestionButtons(topics)}
-
-        </div>
-    `;
-
-}
-
 function createSuggestionButtons(suggestions) {
 
     const icons = {
@@ -1454,15 +1461,6 @@ function createSuggestionButtons(suggestions) {
 
         </div>
     `;
-}
-
-function getRandomKnowledgeTopics(count = 4) {
-
-    const shuffled = [...technologyReplies]
-        .sort(() => Math.random() - 0.5);
-
-    return shuffled.slice(0, count);
-
 }
 
 function createLimitCard() {
@@ -2003,6 +2001,10 @@ function showWelcomeCard() {
         `
 <div class="welcome-card">
 
+    <div class="mobile-welcome-greeting">
+        ${escapeHtml(getGreeting())} 👋
+    </div>
+
     <div class="welcome-title">
         👋 Welcome to CortexFlowAI
     </div>
@@ -2084,6 +2086,7 @@ chatLauncher.addEventListener("click", () => {
     chatWidget.classList.add("open");
     chatWidget.style.opacity = "1";
     chatWidget.style.transform = "none"; // Remove popup centering
+    showMobileProfileNotice();
 
 if (chatBody.children.length === 0) {
     showWelcomeCard();
@@ -2138,6 +2141,90 @@ resetChat.addEventListener("click", () => {
     setTimeout(() => confirmClearChat.focus(), 100);
 });
 
+function closeMobileMenu() {
+    mobileChatMenu.classList.remove("active");
+    mobileChatMenu.setAttribute("aria-hidden", "true");
+    mobileMenuToggle.setAttribute("aria-expanded", "false");
+}
+
+function closeMobileProfile() {
+    mobileProfilePanel.classList.remove("active");
+    mobileProfilePanel.setAttribute("aria-hidden", "true");
+    mobileProfileEditor.classList.remove("active");
+}
+
+function showMobileProfileNotice() {
+    const hasProfile = Boolean(getSavedProfilePhoto() || getSavedProfileName());
+    const dismissed = sessionStorage.getItem(PROFILE_NOTICE_DISMISSED_KEY) === "true";
+
+    if (!hasProfile && !dismissed) {
+        mobileProfileNotice.classList.add("active");
+        mobileProfileNotice.setAttribute("aria-hidden", "false");
+    }
+}
+
+function dismissMobileProfileNotice() {
+    if (!mobileProfileNotice.classList.contains("active")) return;
+    sessionStorage.setItem(PROFILE_NOTICE_DISMISSED_KEY, "true");
+    mobileProfileNotice.classList.remove("active");
+    mobileProfileNotice.setAttribute("aria-hidden", "true");
+}
+
+mobileMenuToggle.addEventListener("click", () => {
+    const isOpen = mobileChatMenu.classList.toggle("active");
+    mobileChatMenu.setAttribute("aria-hidden", String(!isOpen));
+    mobileMenuToggle.setAttribute("aria-expanded", String(isOpen));
+    if (isOpen) closeMobileProfile();
+});
+
+mobileProfileAction.addEventListener("click", () => {
+    closeMobileMenu();
+    mobileProfilePanel.classList.add("active");
+    mobileProfilePanel.setAttribute("aria-hidden", "false");
+});
+
+mobileRefreshAction.addEventListener("click", () => {
+    closeMobileMenu();
+    clearCurrentChat();
+});
+
+mobileClearAction.addEventListener("click", () => {
+    closeMobileMenu();
+    resetChat.click();
+});
+
+mobileProfileClose.addEventListener("click", closeMobileProfile);
+mobileProfilePhoto.addEventListener("click", () => profilePhotoInput.click());
+mobileEditProfile.addEventListener("click", () => {
+    mobileProfileEditor.classList.add("active");
+    mobileProfileNameInput.focus();
+});
+mobileRemoveProfile.addEventListener("click", removeLocalProfile);
+mobileProfileEditor.addEventListener("submit", event => {
+    event.preventDefault();
+    const name = mobileProfileNameInput.value.trim();
+    if (name) {
+        localStorage.setItem(PROFILE_NAME_STORAGE_KEY, name);
+    } else {
+        localStorage.removeItem(PROFILE_NAME_STORAGE_KEY);
+    }
+    updateProfilePhotoUI();
+    closeMobileProfile();
+    dismissMobileProfileNotice();
+});
+
+document.addEventListener("click", event => {
+    if (!event.target.closest(".chat-header-right")) {
+        closeMobileMenu();
+    }
+    if (event.target === mobileProfilePanel) {
+        closeMobileProfile();
+    }
+    if (mobileProfileNotice.classList.contains("active") && !event.target.closest("#mobileProfileNotice")) {
+        dismissMobileProfileNotice();
+    }
+});
+
 cancelClearChat.addEventListener("click", closeClearConfirmation);
 confirmClearChat.addEventListener("click", clearCurrentChat);
 document.addEventListener("keydown", (e) => {
@@ -2154,6 +2241,9 @@ document.addEventListener("keydown", (e) => {
 
     if (e.key === "Escape") {
         e.preventDefault();
+        closeMobileMenu();
+        closeMobileProfile();
+        dismissMobileProfileNotice();
         closeClearConfirmation();
     }
 });
