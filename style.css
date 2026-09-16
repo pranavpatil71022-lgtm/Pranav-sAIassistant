@@ -2845,19 +2845,20 @@ body.chat-open .chat-body{
   .mobile-menu-item:hover,
   .mobile-menu-item:focus-visible{background:rgba(129,140,248,.16);}
 
- .mobile-profile-panel{
+  .mobile-profile-panel{
     position:absolute;
     inset:0;
     z-index:7;
     display:flex;
     flex-direction:column;
-    align-items:flex-end;
+    align-items:center;
     justify-content:flex-start;
-    padding:76px 12px 0;
+    padding:76px 16px 20px;
+    box-sizing:border-box;
     background:rgba(3,7,18,.32);
     backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
   }
-
   .mobile-profile-panel.active{display:flex;}
 
   .mobile-profile-card{
@@ -2901,16 +2902,23 @@ body.chat-open .chat-body{
 
   .mobile-profile-close{
     align-self:flex-start;
-    width:26px;
-    height:26px;
+    width:36px;
+    height:36px;
     margin-left:auto;
     border:0;
-    border-radius:8px;
-    background:rgba(255,255,255,.06);
-    color:#cbd5e1;
+    border-radius:10px;
+    background:rgba(255,255,255,.08);
+    color:#e8efff;
     cursor:pointer;
-    font-size:18px;
+    pointer-events:auto;
+    position:relative;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
     line-height:1;
+    touch-action:manipulation;
   }
  .mobile-profile-actions{
     display:flex;
