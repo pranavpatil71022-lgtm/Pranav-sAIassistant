@@ -1954,8 +1954,20 @@ body.chat-open .chat-body{
   @media (max-width:640px){
 
     .code-panel pre{
-      padding:12px;
-      font-size:12px;
+     width:100%;
+     max-width:100%;
+     box-sizing:border-box;
+
+     padding:12px;
+     font-size:12px;
+     line-height:1.55;
+
+     overflow-x:auto;
+     overflow-y:hidden;
+
+     white-space:pre;
+     -webkit-overflow-scrolling:touch;
+     overscroll-behavior-x:contain;
     }
 
     .code-panel-header{
@@ -3623,14 +3635,21 @@ body.chat-open .chat-body{
   /* Assistant bubble */
   /* CortexFlowAI message — clean ChatGPT-style */
   .msg-row.bot .msg-bubble {
-    max-width: calc(100% - 48px);
-    padding: 4px 8px;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+
+    padding: 4px 2px;
     border-radius: 0;
+
     background: transparent;
     border: none;
     box-shadow: none;
+
     color: #f4f7ff;
     line-height: 1.7;
+
+    box-sizing: border-box;
   }
 
   .msg-row.bot .msg-bubble:hover {

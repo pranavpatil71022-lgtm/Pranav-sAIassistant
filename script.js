@@ -899,6 +899,10 @@ function formatBotText(text){
         formatted = formatted.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
         formatted = formatted.replace(/\*([^*\r\n]+)\*/g, "<em>$1</em>");
 
+        // Remove leftover Markdown emphasis markers
+        formatted = formatted.replace(/(^|\s)\*+(?=\s|$)/g, "$1");
+        formatted = formatted.replace(/(^|\s)_+(?=\s|$)/g, "$1");
+
         return formatted;
     }
 
@@ -1230,7 +1234,53 @@ const cannedReplies = [
         "git version control system"
     ],
     reply:"Git is a distributed version control system used to track changes in code and collaborate on software projects. It lets developers create commits, branches, merge changes, and work safely with tools like GitHub."
-}
+},
+
+{
+    pattern: /\b(python|py)\b.*\b(calculator|calc)\b|\b(calculator|calc)\b.*\b(python|py)\b/i,
+    aliases: [
+        "python calculator",
+        "python calculator code",
+        "give me python calculator code",
+        "calculator in python",
+        "write python calculator"
+    ],
+    reply: `Here is a simple Python calculator:
+
+\`\`\`python
+def calculator():
+    print("Simple Python Calculator")
+    print("1. Addition")
+    print("2. Subtraction")
+    print("3. Multiplication")
+    print("4. Division")
+
+    choice = input("Enter your choice (1-4): ")
+
+    num1 = float(input("Enter first number: "))
+    num2 = float(input("Enter second number: "))
+
+    if choice == "1":
+        result = num1 + num2
+    elif choice == "2":
+        result = num1 - num2
+    elif choice == "3":
+        result = num1 * num2
+    elif choice == "4":
+        if num2 == 0:
+            print("Cannot divide by zero.")
+            return
+        result = num1 / num2
+    else:
+        print("Invalid choice.")
+        return
+
+    print("Result:", result)
+
+
+calculator()
+\`\`\``
+},
 
 ];
 
