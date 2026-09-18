@@ -696,46 +696,6 @@
     background:rgba(239,68,68,.24);
   }
 
-@media (max-width:1200px){
-    .chat-widget{
-        inset:0;
-        width:100vw;
-        height:100dvh;
-        max-width:none;
-        max-height:none;
-        right:0;
-        bottom:0;
-        border-radius:0;
-    }
-}
-
-@media (max-width:768px){
-    .chat-widget{
-        inset:0;
-        width:100vw;
-        height:100dvh;
-        max-width:none;
-        max-height:none;
-        right:0;
-        bottom:0;
-        border-radius:0;
-    }
-}
-
-@media (max-width:480px){
-    .chat-widget{
-        inset:0;
-        width:100vw;
-        height:100dvh;
-        max-width:none;
-        max-height:none;
-        right:0;
-        bottom:0;
-        border-radius:0;
-    }
-}
-
-
   .chat-footer{
     text-align:center;
     font-size:15px;
@@ -930,9 +890,14 @@
   .msg-bubble a{color:#a9b8ff; text-decoration:underline;}
   .msg-row.user .msg-bubble a{color:#fff;}
 
-  .typing-dots{display:flex; gap:4px; padding:4px 0;}
+  .typing-dots{
+    display:flex;
+    gap:4px; 
+    padding:4px 0;}
   .typing-dots span{
-    width:6px; height:6px; border-radius:50%;
+    width:6px; 
+    height:6px; 
+    border-radius:50%;
     background:var(--muted);
     box-shadow:0 0 10px rgba(165,180,252,.35);
     animation:blink 1.2s infinite ease-in-out;
@@ -941,7 +906,7 @@
   .typing-dots span:nth-child(3){animation-delay:0.4s;}
   @keyframes blink{0%,80%,100%{opacity:0.3;} 40%{opacity:1;}}
 
-.chat-input-row{
+  .chat-input-row{
     display:flex;
     align-items:center;
     gap:8px;
@@ -1116,17 +1081,7 @@
     .about-grid{grid-template-columns:1fr;}
     nav ul{flex-wrap:wrap; justify-content:center; gap:12px;}
     header{padding:18px 22px; flex-wrap:wrap; gap:14px; justify-content:center;}
-   .chat-widget{
-    inset:0;
-    width:100vw;
-    height:100dvh;
-    max-width:none;
-    max-height:none;
-    border-radius:0;
-    right:0;
-    left:0;
-    bottom:0;
-    top:0;}
+
     .chat-body{max-height:none;}
     .chat-launcher{right:16px; bottom:16px;}
   }

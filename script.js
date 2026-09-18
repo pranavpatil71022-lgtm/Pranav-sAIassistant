@@ -1525,7 +1525,7 @@ function createSuggestionButtons(suggestions) {
 
 function createLimitCard() {
 
-    const topics = getRandomKnowledgeTopics(4);
+    const topics = getRandomWelcomeKnowledgeTopics().slice(0, 4);
 
     return `
         <div class="ai-limit-card">
@@ -1656,7 +1656,7 @@ function checkSpamProtection(messageText) {
     // 3rd repeated message
     if (repeatCount === 3 && !isAbusive) {
 
-        const topics = getRandomKnowledgeTopics(4);
+        const topics = getRandomWelcomeKnowledgeTopics().slice(0, 4);
 
         addMessage(
             "bot",
