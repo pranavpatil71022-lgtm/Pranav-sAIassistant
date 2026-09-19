@@ -140,11 +140,33 @@ let messageTimestamps = [];
 
 // ===== Chat Protection =====
 let warningCount = 0;
-let blockedUntil = 0;
+let blockedUntil = Number(localStorage.getItem("blockedUntil") || 0);
 let lastMessage = "";
 let repeatCount = 0;
 
 const BLOCK_TIME = 5 * 60 * 1000; // 5 minutes
+
+function syncChatBlockState() {
+    const remaining = blockedUntil - Date.now();
+
+    if (remaining <= 0) {
+        blockedUntil = 0;
+        localStorage.removeItem("blockedUntil");
+
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+
+        updateSendButtonState();
+        return;
+    }
+
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+
+    setTimeout(syncChatBlockState, remaining);
+}
+
+syncChatBlockState();
 
 const abusiveWords = [
     "fuck","fucking","bitch","asshole","bastard","idiot",
@@ -1635,6 +1657,11 @@ function isRateLimited() {
 
 function checkSpamProtection(messageText) {
 
+        if (Date.now() < blockedUntil) {
+        syncChatBlockState();
+        return false;
+    }
+
     const msg = messageText.trim().toLowerCase();
 
     // Check repeated message
@@ -1714,6 +1741,8 @@ function checkSpamProtection(messageText) {
     if (repeatCount >= 5 || isAbusive) {
 
         blockedUntil = Date.now() + BLOCK_TIME;
+
+        chatInput.value = "";
 
         chatInput.disabled = true;
         sendBtn.disabled = true;
@@ -2099,7 +2128,15 @@ responseInProgress = false;
 }
 
  // Event listeners for sending messages
-sendBtn.addEventListener('click', handleUserSendMessage);
+sendBtn.addEventListener('click', () => {
+    handleUserSendMessage().catch(error => {
+        console.error("Chat response error:", error);
+
+        removeTyping();
+        responseInProgress = false;
+        updateSendButtonState();
+    });
+});
 function updateSendButtonState() {
     const isBusy = Boolean(document.getElementById("typingRow"));
     sendBtn.disabled = !chatInput.value.trim() || isBusy;
@@ -2123,7 +2160,13 @@ chatInput.addEventListener('keydown', (e) => {
 
         if (!chatInput.value.trim()) return;
 
-        handleUserSendMessage();
+        handleUserSendMessage().catch(error => {
+        console.error("Chat response error:", error);
+
+        removeTyping();
+        responseInProgress = false;
+        updateSendButtonState();
+    });;
     }
 });
 
@@ -2369,13 +2412,13 @@ function clearCurrentChat() {
     history = [];
     lastUserMessage = "";
 
-    // Reset spam protection state
+    // Reset conversation spam counters,
+    // but NEVER remove an active temporary block.
     warningCount = 0;
     lastMessage = "";
     repeatCount = 0;
 
-    // Re-enable chat input
-    chatInput.disabled = false;
+ syncChatBlockState();
 
     // Clear visible messages
     chatBody.innerHTML = "";
