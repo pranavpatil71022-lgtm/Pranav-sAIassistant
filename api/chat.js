@@ -32,16 +32,40 @@ if (!apiKey) {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    contents: [
-                        {
-                            role: "user",
-                            parts: [
-                                { text: systemPrompt },
-                                { text: message }
-                            ]
-                        }
-                    ]
-                })
+                 contents: [
+                {
+             role: "user",
+             parts: [
+                {
+                    text: `${systemPrompt}
+
+                 PRANAV PUBLIC PROFILE SOURCES:
+                 - LinkedIn: https://www.linkedin.com/in/pranav-g-patil-6230aa365
+                 - GitHub: https://github.com/pranavpatil71022-lgtm
+                 - Instagram: https://www.instagram.com/pranav.xyz_/
+                 - Snapchat: https://www.snapchat.com/add/pranav_patil846
+
+                 PRANAV CONTACT:
+                 - Email: pranavpatil71025@gmail.com
+
+                 PROFILE RULES:
+                 - If the user asks how to contact, reach, or email Pranav, provide the configured email address.
+                 - If the user asks about Pranav's public profile, skills, projects, coding journey, GitHub, LinkedIn, Instagram, or Snapchat, use the relevant public profile sources when available.
+                 - Do not invent information.
+                 - If information cannot be verified from the provided profile context or public sources, say that it is not available.
+
+                USER QUESTION:
+                ${message}`
+                }
+            ]
+        }
+    ],
+    tools: [
+        {
+            url_context: {}
+        }
+    ]
+})
             }
         );
 

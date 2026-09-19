@@ -1779,8 +1779,8 @@ body.chat-open{
 }
 
 /* Hide mobile-only profile notice on desktop */
-.mobile-profile-notice{
-    display:none;
+.profile-notice{
+  display:none;
 }
 
 body.chat-open .chat-body{
@@ -1805,13 +1805,9 @@ body.chat-open .chat-body{
 .message-content code{
 
     background:rgba(255,255,255,.08);
-
     padding:2px 6px;
-
     border-radius:6px;
-
     font-family:Consolas, monospace;
-
     color:#8ab4ff;
 
 }
@@ -1825,7 +1821,6 @@ body.chat-open .chat-body{
     background:linear-gradient(145deg,rgba(15,23,42,.96),rgba(7,12,24,.98));
     box-shadow:0 12px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
     transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
-
   }
 
   .code-panel:hover{
@@ -1833,7 +1828,6 @@ body.chat-open .chat-body{
     transform:translateY(-1px);
     border-color:rgba(129,140,248,.42);
     box-shadow:0 16px 32px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08);
-
   }
 
   .code-panel-header{
@@ -1845,7 +1839,6 @@ body.chat-open .chat-body{
     padding:9px 12px;
     border-bottom:1px solid rgba(148,163,184,.16);
     background:rgba(255,255,255,.045);
-
   }
 
   .code-language{
@@ -2852,27 +2845,483 @@ body.chat-open .chat-body{
     background:transparent;
   }
 
-  .chat-header-right .profile-avatar-control,
+   .chat-header-right .profile-avatar-control,
   .chat-header-right #resetChat,
   .chat-header-right #closeChat{
     display:none;
   }
 
+}
 
-  .mobile-profile-notice{
+/* =========================================================
+   CORTEXFLOWAI — PROFILE SETUP NOTIFICATION
+   Anchored to profile avatar
+   ========================================================= */
+
+.profile-notice{
     position:absolute;
-    top:74px;
-    left:12px;
-    z-index:6;
+
+    top: 72px;
+    right:110px;
+
+    z-index:1000000;
+
+    width:min(320px, calc(100% - 24px));
+
+    padding:14px;
+
     display:none;
-    width:min(230px, calc(100vw - 24px));
-    padding:10px 12px;
-    border:1px solid rgba(176,205,255,.22);
-    border-radius:12px;
-    background:rgba(20,34,62,.95);
-    box-shadow:0 14px 34px rgba(2,10,28,.36);
+    flex-direction:column;
+    gap:13px;
+
+    box-sizing:border-box;
+
+    border:1px solid rgba(167,139,250,.25);
+    border-radius:17px;
+
+    background:
+        radial-gradient(
+            circle at 100% 0%,
+            rgba(139,92,246,.20),
+            transparent 45%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(23,28,52,.97),
+            rgba(9,13,28,.985)
+        );
+
+    box-shadow:
+        0 22px 55px rgba(0,0,0,.45),
+        0 0 32px rgba(124,58,237,.10),
+        inset 0 1px 0 rgba(255,255,255,.07);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    transform-origin:calc(100% - 30px) top;
+
+    overflow:visible;
+
     pointer-events:auto;
-  }
+}
+
+
+/* Small connection point toward profile avatar */
+
+.profile-notice-arrow{
+    position:absolute;
+
+    top:-7px;
+    right:25px;
+
+    width:14px;
+    height:14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(23,28,52,.98),
+            rgba(23,28,52,.98)
+        );
+
+    border-left:1px solid rgba(167,139,250,.25);
+    border-top:1px solid rgba(167,139,250,.25);
+
+    transform:rotate(45deg);
+
+    filter:drop-shadow(
+        -2px -2px 4px rgba(0,0,0,.08)
+    );
+}
+
+
+/* Soft animated glow */
+
+.profile-notice-glow{
+    position:absolute;
+
+    top:-18px;
+    right:15px;
+
+    width:75px;
+    height:75px;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle,
+        rgba(139,92,246,.22),
+        transparent 70%
+    );
+
+    filter:blur(8px);
+
+    pointer-events:none;
+
+    opacity:.8;
+}
+
+
+/* Content */
+
+.profile-notice-content{
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+    gap:11px;
+
+    width:100%;
+    min-width:0;
+}
+
+.profile-notice-copy{
+    flex:1 1 0;
+    width:0;
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.profile-notice-copy strong,
+.profile-notice-copy span{
+    display:block;
+    width:100%;
+}
+
+
+.profile-notice-icon{
+    width:38px;
+    height:38px;
+
+    min-width:38px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(139,92,246,.18),
+            rgba(91,108,255,.12)
+        );
+
+    border:1px solid rgba(167,139,250,.20);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 8px 18px rgba(0,0,0,.20);
+
+    font-size:18px;
+}
+
+
+.profile-notice-copy{
+    min-width:0;
+    flex:1 1 auto;
+    width:auto;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:3px;
+}
+
+
+.profile-notice-copy strong{
+    color:#fff;
+
+    font-size:13px;
+    font-weight:750;
+
+    line-height:1.25;
+
+    letter-spacing:-.01em;
+}
+
+
+.profile-notice-copy span{
+    color:#aeb8d2;
+
+    font-size:11px;
+
+    line-height:1.45;
+}
+
+
+/* Buttons */
+
+.profile-notice-actions{
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+}
+
+
+.profile-notice-primary,
+.profile-notice-skip{
+    height:34px;
+
+    border-radius:10px;
+
+    padding:0 13px;
+
+    border:1px solid transparent;
+
+    font-family:inherit;
+
+    font-size:11px;
+    font-weight:650;
+
+    cursor:pointer;
+
+    transition:
+        transform .18s cubic-bezier(.22,1,.36,1),
+        background .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease,
+        color .18s ease;
+}
+
+
+.profile-notice-primary{
+    flex:1;
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d5dfc,
+            #8b5cf6
+        );
+
+    box-shadow:
+        0 8px 20px rgba(109,93,252,.22),
+        inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+
+.profile-notice-primary:hover{
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 11px 25px rgba(109,93,252,.30),
+        inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+
+.profile-notice-skip{
+    color:#aeb8d2;
+
+    background:rgba(255,255,255,.035);
+
+    border-color:rgba(255,255,255,.08);
+}
+
+
+.profile-notice-skip:hover{
+    color:#fff;
+
+    background:rgba(255,255,255,.07);
+
+    border-color:rgba(167,139,250,.22);
+
+    transform:translateY(-1px);
+}
+
+
+.profile-notice-primary:active,
+.profile-notice-skip:active{
+    transform:scale(.96);
+}
+
+
+/* OPEN ANIMATION
+   Starts from the profile avatar */
+
+.profile-notice.active{
+    display:flex;
+
+    animation:
+        profileNoticeIn
+        .48s
+        cubic-bezier(.22,1,.36,1)
+        both;
+}
+
+
+@keyframes profileNoticeIn{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translate(8px,-8px)
+            scale(.38);
+
+        filter:blur(5px);
+    }
+
+    55%{
+        opacity:1;
+
+        transform:
+            translate(0,1px)
+            scale(1.025);
+
+        filter:blur(0);
+    }
+
+    78%{
+        transform:
+            translate(0,-1px)
+            scale(.995);
+    }
+
+    100%{
+        opacity:1;
+
+        transform:
+            translate(0,0)
+            scale(1);
+
+        filter:blur(0);
+    }
+}
+
+
+/* CLOSE ANIMATION
+   Collapses back into the profile avatar */
+
+.profile-notice.closing{
+    display:flex;
+
+    pointer-events:none;
+
+    animation:
+        profileNoticeOut
+        .38s
+        cubic-bezier(.55,.08,.68,.53)
+        both;
+}
+
+
+@keyframes profileNoticeOut{
+
+    0%{
+        opacity:1;
+
+        transform:
+            translate(0,0)
+            scale(1);
+
+        filter:blur(0);
+    }
+
+    35%{
+        opacity:.85;
+
+        transform:
+            translate(3px,-2px)
+            scale(.92);
+    }
+
+    100%{
+        opacity:0;
+
+        transform:
+            translate(9px,-8px)
+            scale(.32);
+
+        filter:blur(4px);
+    }
+}
+
+
+/* Respect reduced motion */
+
+@media (prefers-reduced-motion:reduce){
+
+    .profile-notice.active,
+    .profile-notice.closing{
+        animation:none;
+    }
+
+    .profile-notice.active{
+        opacity:1;
+        transform:none;
+    }
+}
+
+/* =========================================================
+   MOBILE PROFILE NOTIFICATION — RESPONSIVE OVERRIDES
+   ========================================================= */
+
+@media (max-width:600px){
+
+    .profile-notice{
+        top:70px;
+        right:10px;
+
+        width:min(
+            300px,
+            calc(100vw - 20px)
+        );
+
+        padding:13px;
+
+        border-radius:16px;
+    }
+
+    .profile-notice-icon{
+        width:36px;
+        height:36px;
+        min-width:36px;
+
+        border-radius:11px;
+
+        font-size:17px;
+    }
+
+    .profile-notice-copy strong{
+        font-size:12px;
+    }
+
+    .profile-notice-copy span{
+        font-size:10px;
+    }
+
+    .profile-notice-primary,
+    .profile-notice-skip{
+        height:32px;
+
+        font-size:10px;
+
+        padding:0 12px;
+    }
+}
+
+
+@media (max-width:380px){
+
+    .profile-notice{
+        right:8px;
+
+        width:calc(100vw - 16px);
+
+        padding:12px;
+    }
+}
 
   .mobile-profile-notice.active{display:flex; flex-direction:column; gap:3px; animation:mobileNoticeIn .2s ease-out both;}
   .mobile-profile-notice strong{color:#fff; font-size:12px;}
@@ -2882,7 +3331,6 @@ body.chat-open .chat-body{
     from{opacity:0; transform:translateY(-4px);}
     to{opacity:1; transform:translateY(0);}
   }
-}
 
 .loader-particles span:nth-child(1){left:5%;width:5px;height:5px;animation:particleFloat 8s infinite;}
 .loader-particles span:nth-child(2){left:15%;width:8px;height:8px;animation:particleFloat 11s infinite;}
@@ -2896,13 +3344,9 @@ body.chat-open .chat-body{
 .loader-particles span{
 
     position:absolute;
-
     bottom:-40px;
-
     border-radius:50%;
-
     opacity:.7;
-
     background:linear-gradient(
         135deg,
         #8B5CF6,
@@ -4009,6 +4453,20 @@ body.chat-open .chat-body{
   justify-content:flex-end !important;
   gap:8px !important;
   flex:0 0 auto !important;
+}
+
+/* =========================================================
+   PROFILE NOTICE — ANCHOR TO PROFILE ICON
+   ========================================================= */
+
+.profile-notice-anchor{
+    position:relative !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    flex:0 0 auto !important;
 }
 
 .chat-header-action,
@@ -7550,5 +8008,629 @@ body.chat-open .chat-body{
         height:100% !important;
         border-radius:50% !important;
         object-fit:cover !important;
+    }
+}
+
+/* =========================================================
+   CORTEXFLOWAI — SOCIAL PROFILE SELECTOR
+   ========================================================= */
+
+.social-selector-card {
+    width: min(100%, 980px);
+    margin: 8px 0 4px;
+    padding: 22px;
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(circle at 15% 10%, rgba(91, 71, 255, 0.14), transparent 32%),
+        radial-gradient(circle at 85% 90%, rgba(168, 63, 255, 0.12), transparent 34%),
+        rgba(12, 18, 38, 0.88);
+
+    border: 1px solid rgba(125, 119, 255, 0.28);
+    border-radius: 22px;
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.social-selector-header {
+    margin-bottom: 18px;
+}
+
+.social-selector-header h3 {
+    margin: 0;
+    color: #f5f5ff;
+    font-size: 18px;
+    line-height: 1.45;
+    font-weight: 700;
+}
+
+.social-selector-header p {
+    margin: 7px 0 0;
+    color: rgba(220, 222, 245, 0.65);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ---------- PLATFORM GRID ---------- */
+
+.social-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* ---------- PLATFORM BUTTON ---------- */
+
+.social-platform-btn {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    min-width: 0;
+    min-height: 76px;
+    padding: 12px 13px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 15px;
+
+    background: rgba(255, 255, 255, 0.035);
+
+    color: #ffffff;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+.social-platform-btn:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.social-platform-btn:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.social-platform-btn:focus-visible {
+    outline: 2px solid rgba(151, 133, 255, 0.9);
+    outline-offset: 2px;
+}
+
+/* ---------- ICON ---------- */
+
+.social-platform-icon {
+    flex: 0 0 42px;
+
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 5px 15px rgba(0, 0, 0, 0.18);
+}
+
+.social-platform-icon svg {
+    width: 23px;
+    height: 23px;
+    display: block;
+}
+
+/* ---------- TEXT ---------- */
+
+.social-platform-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.social-platform-info strong {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.social-platform-info small {
+    color: rgba(220, 222, 245, 0.58);
+    font-size: 11px;
+    line-height: 1.2;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- ARROW ---------- */
+
+.social-platform-arrow {
+    margin-left: auto;
+
+    flex: 0 0 auto;
+
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 25px;
+    line-height: 1;
+
+    transition:
+        transform 0.22s ease,
+        color 0.22s ease;
+}
+
+.social-platform-btn:hover .social-platform-arrow {
+    transform: translateX(3px);
+    color: #ffffff;
+}
+
+/* ---------- PLATFORM STATES ---------- */
+
+.social-platform-btn.linkedin:hover {
+    border-color: rgba(10, 102, 194, 0.8);
+    box-shadow: 0 10px 28px rgba(10, 102, 194, 0.18);
+}
+
+.social-platform-btn.linkedin .social-platform-icon {
+    color: #4ea1ff;
+}
+
+.social-platform-btn.github:hover {
+    border-color: rgba(170, 170, 190, 0.65);
+    box-shadow: 0 10px 28px rgba(180, 180, 200, 0.12);
+}
+
+.social-platform-btn.github .social-platform-icon {
+    color: #f4f4f7;
+}
+
+.social-platform-btn.instagram:hover {
+    border-color: rgba(225, 48, 108, 0.75);
+    box-shadow: 0 10px 28px rgba(225, 48, 108, 0.18);
+}
+
+.social-platform-btn.instagram .social-platform-icon {
+    color: #ff5fa2;
+}
+
+.social-platform-btn.snapchat:hover {
+    border-color: rgba(255, 221, 0, 0.75);
+    box-shadow: 0 10px 28px rgba(255, 221, 0, 0.14);
+}
+
+.social-platform-btn.snapchat .social-platform-icon {
+    color: #ffe000;
+}
+
+/* ---------- FOOTER ---------- */
+
+.social-selector-footer {
+    margin-top: 17px;
+
+    color: rgba(215, 217, 240, 0.52);
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    font-style: italic;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .social-selector-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+@media (max-width: 600px) {
+    .social-selector-card {
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .social-selector-header {
+        margin-bottom: 14px;
+    }
+
+    .social-selector-header h3 {
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .social-selector-header p {
+        font-size: 12px;
+    }
+
+    .social-selector-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .social-platform-btn {
+        width: 100%;
+        min-height: 64px;
+        padding: 10px 12px;
+        border-radius: 14px;
+    }
+
+    .social-platform-icon {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+
+    .social-platform-info strong {
+        font-size: 14px;
+    }
+
+    .social-platform-info small {
+        font-size: 10.5px;
+    }
+
+    .social-selector-footer {
+        margin-top: 14px;
+        font-size: 11px;
+    }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+    .social-selector-card {
+        padding: 13px;
+    }
+
+    .social-selector-header h3 {
+        font-size: 15px;
+    }
+
+    .social-platform-btn {
+        min-height: 60px;
+    }
+
+    .social-platform-icon {
+        width: 37px;
+        height: 37px;
+        flex-basis: 37px;
+    }
+
+    .social-platform-icon svg {
+        width: 21px;
+        height: 21px;
+    }
+}
+
+/* =========================================================
+   CORTEXFLOWAI — SOCIAL PROFILE RESULT CARD
+   Desktop only
+   ========================================================= */
+
+@media (min-width: 601px) {
+
+    .msg-row.bot:has(.social-profile-card) {
+        max-width: 760px;
+    }
+
+    .msg-row.bot:has(.social-profile-card) .msg-bubble {
+        width: min(100%, 700px);
+        max-width: 700px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .social-profile-card {
+        width: 100%;
+        max-width: 680px;
+        margin: 8px 0 4px;
+        padding: 22px;
+        box-sizing: border-box;
+
+        background:
+            radial-gradient(
+                circle at 15% 10%,
+                rgba(91, 71, 255, 0.14),
+                transparent 32%
+            ),
+            radial-gradient(
+                circle at 85% 90%,
+                rgba(168, 63, 255, 0.12),
+                transparent 34%
+            ),
+            rgba(12, 18, 38, 0.92);
+
+        border: 1px solid rgba(125, 119, 255, 0.28);
+        border-radius: 20px;
+
+        box-shadow:
+            0 18px 45px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+
+    .social-profile-top {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .social-profile-icon {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: 14px;
+        background: rgba(255,255,255,.08);
+
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.08),
+            0 6px 18px rgba(0,0,0,.2);
+    }
+
+    .social-profile-icon svg {
+        width: 27px;
+        height: 27px;
+        display: block;
+    }
+
+    .social-profile-heading {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .social-profile-platform {
+     color: rgba(220,222,245,.72);
+     font-size: 11px;
+     font-weight: 700;
+     letter-spacing: 0.04em;
+     text-transform: uppercase;
+    }
+
+    .social-profile-heading h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 18px;
+        line-height: 1.25;
+    }
+
+    .social-profile-handle {
+     color: #c2c9e3;
+     font-size: 13px;
+     font-weight: 500;
+     letter-spacing: 0.01em;
+    }
+
+    .social-profile-description {
+        margin: 14px 0 15px;
+        color: #c7cee2;
+        font-size: 14px;
+        line-height: 1.65;
+    }
+
+    .social-profile-visit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 40px;
+    padding: 0 15px;
+
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 11px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .social-profile-visit:hover {
+     color: #ffffff;
+     background: rgba(255, 255, 255, 0.12);
+     border-color: rgba(170, 180, 255, 0.28);
+     transform: translateY(-1px);
+    }
+
+    .social-profile-visit-arrow {
+        transition: transform .2s ease;
+    }
+
+    .social-profile-visit:hover .social-profile-visit-arrow {
+        transform: translate(2px, -2px);
+    }
+
+    .social-profile-footer {
+      display: none;
+      margin-top: 17px;
+      color: rgba(215,217,240,.52);
+      font-size: 12px;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* Platform colors */
+
+    .social-profile-card.linkedin .social-profile-icon {
+        color: #4ea1ff;
+    }
+
+    .social-profile-card.github .social-profile-icon {
+        color: #f4f4f7;
+    }
+
+    .social-profile-card.instagram .social-profile-icon {
+        color: #ff5fa2;
+    }
+
+    .social-profile-card.snapchat .social-profile-icon {
+        color: #ffe000;
+    }
+}
+
+/* =========================================================
+   CORTEXFLOWAI — PROFILE NOTICE ANCHOR FIX
+   DESKTOP POSITIONING
+   ========================================================= */
+
+.profile-notice-anchor{
+    position:relative !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    width:44px !important;
+    height:44px !important;
+    min-width:44px !important;
+    min-height:44px !important;
+
+    flex:0 0 44px !important;
+}
+
+/* Desktop notification */
+@media (min-width:601px){
+
+    .profile-notice-anchor .profile-notice{
+        position:absolute !important;
+
+        top:calc(100% + 14px) !important;
+        right:0 !important;
+        left:auto !important;
+
+        width:320px !important;
+        max-width:320px !important;
+
+        z-index:1000000 !important;
+
+        box-sizing:border-box !important;
+
+        transform-origin:calc(100% - 25px) top !important;
+    }
+
+    .profile-notice-anchor .profile-notice.active{
+        display:flex !important;
+    }
+
+    .profile-notice-anchor .profile-notice-arrow{
+        top:-7px !important;
+        right:18px !important;
+    }
+
+}
+
+/* =========================================================
+   MOBILE — SOCIAL PROFILE CARD ICON FIX
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .social-profile-card {
+        width: 100%;
+        max-width: 100%;
+        margin: 8px 0 4px;
+        padding: 16px;
+        box-sizing: border-box;
+
+        background:
+            radial-gradient(
+                circle at 15% 10%,
+                rgba(91, 71, 255, 0.14),
+                transparent 32%
+            ),
+            radial-gradient(
+                circle at 85% 90%,
+                rgba(168, 63, 255, 0.12),
+                transparent 34%
+            ),
+            rgba(12, 18, 38, 0.92);
+
+        border: 1px solid rgba(125, 119, 255, 0.28);
+        border-radius: 18px;
+    }
+
+    .social-profile-icon {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: 14px;
+        background: rgba(255,255,255,.08);
+    }
+
+    .social-profile-icon svg {
+        width: 27px !important;
+        height: 27px !important;
+        max-width: 27px;
+        max-height: 27px;
+        display: block;
+    }
+
+    .social-profile-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .social-profile-heading {
+        min-width: 0;
+    }
+
+    .social-profile-heading h3 {
+        font-size: 17px;
+    }
+
+    .social-profile-handle {
+        font-size: 13px;
+    }
+
+    .social-profile-description {
+        margin: 14px 0 15px;
+        font-size: 14px;
+        line-height: 1.6;
     }
 }

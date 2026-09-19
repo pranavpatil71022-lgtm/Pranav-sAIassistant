@@ -362,9 +362,61 @@ result="coloredBlur"/>
       </div>
     </div>
     <div class="chat-header-right">
-      <button class="profile-avatar-control" id="profileAvatarControl" type="button" title="Upload or change profile photo" aria-label="Upload or change profile photo">
-        <span class="profile-avatar-preview" id="profileAvatarPreview" aria-hidden="true"></span>
-      </button>
+      <div class="profile-notice-anchor">
+
+        <button
+          class="profile-avatar-control"
+          id="profileAvatarControl"
+          type="button"
+          title="Upload or change profile photo"
+          aria-label="Upload or change profile photo"
+        >
+          <span
+            class="profile-avatar-preview"
+            id="profileAvatarPreview"
+            aria-hidden="true"
+          ></span>
+        </button>
+
+        <div
+          class="profile-notice"
+          id="mobileProfileNotice"
+          role="status"
+          aria-hidden="true"
+        >
+          <div class="profile-notice-glow"></div>
+
+          <div class="profile-notice-content">
+            <div class="profile-notice-icon" aria-hidden="true">
+              <span>👤</span>
+            </div>
+
+            <div class="profile-notice-copy">
+              <strong id="profileNoticeTitle">Set up your profile</strong>
+              <span id="profileNoticeMessage">
+                Add your name and profile photo to personalize your chat.
+              </span>
+            </div>
+          </div>
+
+          <div class="profile-notice-actions">
+            <button
+              type="button"
+              class="profile-notice-primary"
+              id="profileNoticeSetup"
+            >Set Profile</button>
+
+            <button
+              type="button"
+              class="profile-notice-skip"
+              id="profileNoticeSkip"
+            >Skip</button>
+          </div>
+
+          <span class="profile-notice-arrow" aria-hidden="true"></span>
+        </div>
+
+      </div>
       <button class="chat-header-action" id="resetChat" type="button" title="Clear chat" aria-label="Clear chat">↻</button>
       <button class="chat-header-action" id="minimizeChat" type="button" title="Minimize chat" aria-label="Minimize chat">—</button>
       <button class="chat-header-action" id="closeChat" type="button" title="Close chat" aria-label="Close chat">✕</button>
@@ -398,10 +450,7 @@ result="coloredBlur"/>
       </div>
     </form>
   </div>
-  <div class="mobile-profile-notice" id="mobileProfileNotice" role="status" aria-hidden="true">
-    <strong>👤 Set up your profile</strong>
-    <span>Add your name and photo to personalize your chat.</span>
-  </div>
+
   <div class="clear-confirm" id="clearConfirm" aria-hidden="true">
     <div class="clear-confirm-card" role="dialog" aria-modal="true" aria-labelledby="clearConfirmTitle" aria-describedby="clearConfirmDescription" tabindex="-1">
       <div class="clear-confirm-icon">↻</div>

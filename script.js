@@ -1,3 +1,11 @@
+const PRANAV_SOCIAL_LINKS = {
+    github: "https://github.com/pranavpatil71022-lgtm",
+    linkedin: "https://www.linkedin.com/in/pranav-g-patil-6230aa365",
+    instagram: "https://www.instagram.com/pranav.xyz_/",
+    snapchat: "https://www.snapchat.com/add/pranav_patil846",
+    email: "mailto:pranavpatil71025@gmail.com"
+};
+
 const SYSTEM_PROMPT = `
 You are CortexFlowAI, an intelligent, helpful, and conversational AI assistant created by Pranav Patil.
 
@@ -31,19 +39,47 @@ ANSWERING RULES:
 - If information is uncertain or unavailable, say so instead of guessing.
 
 PRANAV PATIL INFORMATION:
-You also have information about Pranav Patil and his portfolio.
 
-When users ask about Pranav, his portfolio, skills, projects, education, experience, achievements, or contact information, use the provided profile information.
+Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer.
 
-Do not invent or assume personal information about Pranav.
-If the requested information is not available in the provided profile information, say that you do not have that information.
+PROFILE:
+- Name: Pranav Patil
+- Role: Aspiring Software Engineer
+- Interests: Cybersecurity, web development, software development, artificial intelligence, and secure web development.
+- Pranav is currently focused on learning, improving his programming skills, building projects, and developing his technical knowledge.
 
-Pranav is a cybersecurity enthusiast and aspiring software engineer with interests in:
-- Cybersecurity
-- Web development
-- Software development
-- Artificial intelligence
-- Secure web development
+CODING JOURNEY:
+- Pranav started coding in 2025.
+- He built his first website in 2026.
+- He is currently learning Data Structures and Algorithms and building projects.
+- His long-term goal is to become a Software Engineer.
+
+TECHNICAL SKILLS:
+- HTML
+- CSS
+- JavaScript
+- C
+- C++
+- Data Structures & Algorithms
+- Git
+- GitHub
+- Problem Solving
+
+PROJECTS:
+1. CortexFlowAI
+   - An AI-powered assistant created by Pranav Patil.
+   - It is designed to answer technology and programming questions and provide information about Pranav and his portfolio.
+   - It combines a local knowledge base with Gemini AI.
+
+2. Portfolio Website
+   - A responsive personal portfolio website created to showcase Pranav's skills, projects, and development journey.
+
+IMPORTANT PROFILE RULES:
+- Use this information when answering questions specifically about Pranav.
+- You may combine multiple pieces of this profile to create a natural and detailed answer.
+- Do not invent projects, achievements, education, experience, skills, links, or personal information that are not provided here.
+- If the user asks for information that is not available here, clearly say that the information is not currently available.
+- Do not present assumptions as facts.
 
 CORTEXFLOWAI:
 CortexFlowAI is an AI assistant created by Pranav Patil.
@@ -130,13 +166,10 @@ const mobileProfileEditor = document.getElementById('mobileProfileEditor');
 const mobileProfileNameInput = document.getElementById('mobileProfileNameInput');
 const mobileProfilePhoto = document.getElementById('mobileProfilePhoto');
 const mobileProfileNotice = document.getElementById('mobileProfileNotice');
+const profileNoticeSetup = document.getElementById("profileNoticeSetup");
+const profileNoticeSkip = document.getElementById("profileNoticeSkip");
 let history = [];
 let lastUserMessage = "";
-
-// ===== Rate Limiting =====
-const MAX_MESSAGES_PER_WINDOW = 5;
-const RATE_LIMIT_WINDOW = 30 * 60 * 1000; // 30 minutes
-let messageTimestamps = [];
 
 // ===== Chat Protection =====
 let warningCount = 0;
@@ -1122,8 +1155,14 @@ const cannedReplies = [
   aliases:[
     "who is pranav",
     "pranav patil",
-    "about pranav"
-  ],
+    "about pranav",
+    "about me",
+    "tell me about me",
+    "pranav",
+    "pranav patil",
+    "Pranav Patil",
+    "prnav"
+   ],
   reply:"Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer passionate about building modern web applications and AI-powered solutions."
 },
 
@@ -1638,22 +1677,6 @@ async function fetchAIReply(userMessage) {
 
 // Main function to handle sending messages
 
-function isRateLimited() {
-
-    const now = Date.now();
-
-    // Keep only timestamps from the last 30 minutes
-    messageTimestamps = messageTimestamps.filter(
-        time => now - time < RATE_LIMIT_WINDOW
-    );
-
-    if (messageTimestamps.length >= MAX_MESSAGES_PER_WINDOW) {
-        return true;
-    }
-
-    messageTimestamps.push(now);
-    return false;
-}
 
 function checkSpamProtection(messageText) {
 
@@ -1794,6 +1817,312 @@ function checkSpamProtection(messageText) {
 }
 
 let responseInProgress = false;
+
+function isPranavQuestion(message) {
+    const text = message.toLowerCase().trim();
+
+    const pranavPatterns = [
+        /\bpranav\b/,
+        /\bpatil\b/,
+        /\babout (you|yourself|me)\b/,
+        /\bwho (are|is) (you|pranav)\b/,
+        /\bwhat (do|does) (you|pranav)\b/,
+        /\bwhat has (you|pranav) (built|made|created)\b/,
+        /\bwhat (are|is) (your|pranav'?s) (skills|work|experience|education)\b/,
+        /\b(your|pranav'?s) (journey|projects|portfolio|career|learning)\b/,
+        /\bwhere (can|do) .*?(reach|contact|find) .*?(you|pranav)\b/,
+        /\bcreator\b.*\b(cortexflowai|cortex flow ai)\b/
+    ];
+
+    return pranavPatterns.some(pattern => pattern.test(text));
+}
+
+function getRequestedSocialPlatform(message) {
+    const text = message.toLowerCase().trim();
+
+    if (/\b(github|git hub)\b/.test(text)) {
+        return "github";
+    }
+
+    if (/\b(linkedin|linked in|linkdin)\b/.test(text)) {
+     return "linkedin";
+    }
+    if (/\b(instagram|insta|ig)\b/.test(text)) {
+        return "instagram";
+    }
+
+    if (/\b(snapchat|snap)\b/.test(text)) {
+        return "snapchat";
+    }
+
+    if (/\b(email|e-mail|mail)\b/.test(text)) {
+        return "email";
+    }
+
+    return null;
+}
+
+function createSocialSelector() {
+    return `
+        <div class="social-selector-card">
+            <div class="social-selector-header">
+                <div>
+                    <h3>Which social media account would you like to explore for Pranav? 🚀</h3>
+                    <p>Choose a platform below to view the profile.</p>
+                </div>
+            </div>
+
+            <div class="social-selector-grid">
+
+                <button
+                    type="button"
+                    class="social-platform-btn linkedin"
+                    data-social-platform="linkedin"
+                >
+                    <span class="social-platform-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor"
+                                d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.32 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM3.54 20.45h3.56V9H3.54v11.45z"/>
+                        </svg>
+                    </span>
+
+                    <span class="social-platform-info">
+                        <strong>LinkedIn</strong>
+                        <small>Professional</small>
+                    </span>
+
+                    <span class="social-platform-arrow">›</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="social-platform-btn github"
+                    data-social-platform="github"
+                >
+                    <span class="social-platform-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor"
+                                d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.17c-3.2.7-3.88-1.54-3.88-1.54-.53-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.25 3.34.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.92 10.92 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.39-5.27 5.67.41.35.78 1.04.78 2.1v3.11c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+                        </svg>
+                    </span>
+
+                    <span class="social-platform-info">
+                        <strong>GitHub</strong>
+                        <small>Projects &amp; Code</small>
+                    </span>
+
+                    <span class="social-platform-arrow">›</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="social-platform-btn instagram"
+                    data-social-platform="instagram"
+                >
+                    <span class="social-platform-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="5"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"/>
+                            <circle cx="12" cy="12" r="4"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"/>
+                            <circle cx="17.5" cy="6.5" r="1"
+                                fill="currentColor"/>
+                        </svg>
+                    </span>
+
+                    <span class="social-platform-info">
+                        <strong>Instagram</strong>
+                        <small>Life &amp; Updates</small>
+                    </span>
+
+                    <span class="social-platform-arrow">›</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="social-platform-btn snapchat"
+                    data-social-platform="snapchat"
+                >
+                    <span class="social-platform-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor"
+                                d="M12 2.2c-3.18 0-5.1 2.19-5.1 5.24v2.02c0 .45-.18.7-.65.91-.42.19-1.02.35-1.02.87 0 .61.76.8 1.31.95.45.12.82.23.82.61 0 .47-.7 1.08-1.17 1.38-.32.2-.68.32-.68.68 0 .43.57.67 1.16.72.42.04.8.06 1.06.3.3.27.28.75.61 1.06.28.26.73.3 1.28.34.69.05 1.57.11 2.38.69.34.25.78.62 1.98.62s1.64-.37 1.98-.62c.81-.58 1.69-.64 2.38-.69.55-.04 1-.08 1.28-.34.33-.31.31-.79.61-1.06.26-.24.64-.26 1.06-.3.59-.05 1.16-.29 1.16-.72 0-.36-.36-.48-.68-.68-.47-.3-1.17-.91-1.17-1.38 0-.38.37-.49.82-.61.55-.15 1.31-.34 1.31-.95 0-.52-.6-.68-1.02-.87-.47-.21-.65-.46-.65-.91V7.44C17.1 4.39 15.18 2.2 12 2.2z"/>
+                        </svg>
+                    </span>
+
+                    <span class="social-platform-info">
+                        <strong>Snapchat</strong>
+                        <small>Daily Moments</small>
+                    </span>
+
+                    <span class="social-platform-arrow">›</span>
+                </button>
+
+            </div>
+
+            <div class="social-selector-footer">
+                Connect, explore, and follow Pranav's journey.
+            </div>
+        </div>
+    `;
+}
+
+function createSocialProfileCard(platform) {
+    const profile = {
+        linkedin: {
+            name: "LinkedIn",
+            handle: "Pranav G. Patil",
+            description: "Explore Pranav's professional profile, learning journey, and development interests.",
+            url: PRANAV_SOCIAL_LINKS.linkedin,
+            className: "linkedin",
+            icon: `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                        d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.32 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM3.54 20.45h3.56V9H3.54v11.45z"/>
+                </svg>
+            `
+        },
+
+        github: {
+            name: "GitHub",
+            handle: "pranavpatil71022-lgtm",
+            description: "Explore Pranav's projects, code, experiments, and development work.",
+            url: PRANAV_SOCIAL_LINKS.github,
+            className: "github",
+            icon: `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                        d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.17c-3.2.7-3.88-1.54-3.88-1.54-.53-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.25 3.34.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.92 10.92 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.39-5.27 5.67.41.35.78 1.04.78 2.1v3.11c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+                </svg>
+            `
+        },
+
+        instagram: {
+            name: "Instagram",
+            handle: "@pranav.xyz_",
+            description: "Take a look at Pranav's Instagram profile and follow his journey beyond the code.",
+            url: PRANAV_SOCIAL_LINKS.instagram,
+            className: "instagram",
+            icon: `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"/>
+                    <circle cx="17.5" cy="6.5" r="1"
+                        fill="currentColor"/>
+                </svg>
+            `
+        },
+
+        snapchat: {
+            name: "Snapchat",
+            handle: "pranav_patil846",
+            description: "Connect with Pranav on Snapchat and explore his public profile.",
+            url: PRANAV_SOCIAL_LINKS.snapchat,
+            className: "snapchat",
+            icon: `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+            fill="currentColor"
+            d="M12 2.5
+               C8.8 2.5 6.4 4.8 6.4 8.1
+               V10c0 .7-.3 1-1 1.3
+               l-1.2.5c-.5.2-.8.6-.7 1
+               .1.5.5.8 1 .9
+               l1.1.2c.3.1.5.3.6.7
+               .2.7.5 1.2 1.2 1.3
+               .5.1 1 .1 1.5.3
+               .6.2 1.1.7 1.5 1.1
+               .4.4.9.7 1.6.7
+               .7 0 1.2-.3 1.6-.7
+               .4-.4.9-.9 1.5-1.1
+               .5-.2 1-.2 1.5-.3
+               .7-.1 1-.6 1.2-1.3
+               .1-.4.3-.6.6-.7
+               l1.1-.2c.5-.1.9-.4 1-.9
+               .1-.4-.2-.8-.7-1
+               l-1.2-.5c-.7-.3-1-.6-1-1.3V8.1
+               C17.6 4.8 15.2 2.5 12 2.5Z"
+               />
+               </svg>
+               `
+            }
+    };
+
+    const selected = profile[platform];
+
+    if (!selected) {
+        return "";
+    }
+
+    return `
+        <div class="social-profile-card ${selected.className}">
+            <div class="social-profile-top">
+                <div class="social-profile-icon">
+                    ${selected.icon}
+                </div>
+
+                <div class="social-profile-heading">
+                    <span class="social-profile-platform">
+                        ${selected.name}
+                    </span>
+
+                    <h3>Pranav's ${selected.name}</h3>
+
+                    <span class="social-profile-handle">
+                        ${selected.handle}
+                    </span>
+                </div>
+            </div>
+
+            <p class="social-profile-description">
+                ${selected.description}
+            </p>
+
+            <a
+                class="social-profile-visit"
+                href="${selected.url}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <span>Visit Pranav on ${selected.name}</span>
+                <span class="social-profile-visit-arrow">↗</span>
+            </a>
+
+            <div class="social-profile-footer">
+                Connect, explore, and be part of the journey.
+            </div>
+        </div>
+    `;
+}
+
+document.addEventListener("click", function (event) {
+    const socialButton = event.target.closest(".social-platform-btn");
+
+    if (!socialButton) {
+        return;
+    }
+
+    const platform = socialButton.dataset.socialPlatform;
+
+    if (!platform) {
+        return;
+    }
+
+    addMessage("bot", createSocialProfileCard(platform));
+});
 
 function isPortfolioProjectRequest(message) {
     const text = message.toLowerCase();
@@ -1941,6 +2270,7 @@ async function handleUserSendMessage() {
   addMessage('user', escapeHtml(messageText));
   lastUserMessage = messageText;
     const mathReply = tryCalculateBasicMath(messageText);
+    const shouldUseGemini = isActionRequest(messageText);
 
    if (mathReply !== null) {
     addTyping();
@@ -1954,7 +2284,109 @@ async function handleUserSendMessage() {
     return;
   }
 
-    const shouldUseGemini = isActionRequest(messageText);
+    // ===== Broad Pranav social request =====
+  const socialRequest = /\b(social media|social links|social accounts|social profiles|find pranav online|where can i find pranav online)\b/i.test(messageText);
+
+ if (
+    isPranavQuestion(messageText) &&
+    socialRequest &&
+    !getRequestedSocialPlatform(messageText)
+ ) {
+    addMessage("bot", createSocialSelector());
+
+    responseInProgress = false;
+    return;
+ }
+
+   // ===== Specific Pranav social request =====
+
+   // ===== General social platform request =====
+ if (/^(instagram|insta|ig)$/i.test(messageText.trim())) {
+    addMessage(
+        "bot",
+        formatBotText(
+            "Instagram is a social media platform for sharing photos, videos, Stories, Reels, and connecting with people and creators. If you're looking for Pranav's Instagram, ask **Pranav Instagram** and I'll show you his profile."
+        )
+    );
+
+    responseInProgress = false;
+    return;
+ }
+
+ if (/^(snapchat|snap)$/i.test(messageText.trim())) {
+    addMessage(
+        "bot",
+        formatBotText(
+            "Snapchat is a social media platform focused on messaging, photos, videos, Stories, and other visual content. If you're looking for Pranav's Snapchat, ask **Pranav Snapchat** and I'll show you his profile."
+        )
+    );
+
+    responseInProgress = false;
+    return;
+ }
+
+  const requestedSocialPlatform = getRequestedSocialPlatform(messageText);
+
+const directPranavSocialRequest =
+    /^(?:(?:can i get|show me|give me|open|visit)\s+)?(?:pranav(?:'s)?\s+)?(?:github|git hub|linkedin|linked in|instagram|insta|snapchat|snap)\s*$/i
+        .test(messageText.trim());
+
+if (
+    isPranavQuestion(messageText) &&
+    requestedSocialPlatform &&
+    directPranavSocialRequest
+) {
+    addMessage(
+        "bot",
+        createSocialProfileCard(requestedSocialPlatform)
+    );
+
+    responseInProgress = false;
+    return;
+}
+
+ // ===== Pranav questions always go to Gemini =====
+ if (isPranavQuestion(messageText)) {
+    addTyping();
+
+    const aiReply = await fetchAIReply(messageText);
+
+    removeTyping();
+
+    if (!aiReply) {
+        responseInProgress = false;
+        return;
+    }
+
+   if (aiReply.error) {
+
+    const fallbackReply = getMockReply(messageText);
+
+    if (fallbackReply !== null) {
+        addMessage(
+            "bot",
+            formatBotText(fallbackReply.reply || fallbackReply)
+        );
+
+        responseInProgress = false;
+        return;
+    }
+
+    addMessage(
+        "bot",
+        formatBotText(
+            "Gemini is temporarily unavailable. Please try again shortly."
+        )
+    );
+
+    responseInProgress = false;
+    return;
+}
+
+    addMessage("bot", formatBotText(aiReply));
+    responseInProgress = false;
+    return;
+  }
 
   // Check local canned responses first
  
@@ -2053,18 +2485,6 @@ if (suggestions.length > 0) {
     return;
 }
 
-
-// Limit only Gemini requests
-if (isRateLimited()) {
-    addMessage(
-        "bot",
-        createLimitCard()
-    );
-
-    responseInProgress = false;
-    return;
-}
-
 // No local answer or suggestion, ask Gemini
 addTyping();
 
@@ -2081,6 +2501,20 @@ removeTyping();
 
 if (aiReply.error) {
 
+    // Gemini unavailable → try local canned reply
+    const fallbackReply = getMockReply(messageText);
+
+    if (fallbackReply !== null) {
+        addMessage(
+            "bot",
+            formatBotText(fallbackReply.reply || fallbackReply)
+        );
+
+        responseInProgress = false;
+        return;
+    }
+
+    // No canned reply available → show normal Gemini error
     addMessage(
         "bot",
         `
@@ -2095,7 +2529,6 @@ if (aiReply.error) {
             </div>
 
             <div class="ai-error-text">
-
                 Please try again in a moment.
 
                 <br><br>
@@ -2107,7 +2540,6 @@ if (aiReply.error) {
                     <li>✏️ Rephrase your question</li>
                     <li>🌐 Check your internet connection</li>
                 </ul>
-
             </div>
 
         </div>
@@ -2364,12 +2796,16 @@ chatLauncher.addEventListener("click", () => {
 
     chatWidget.classList.add("open");
     chatWidget.style.opacity = "1";
-    chatWidget.style.transform = "none"; // Remove popup centering
-    showMobileProfileNotice();
+    chatWidget.style.transform = "none"; 
 
-if (chatBody.children.length === 0) {
+ // Remove popup centering
+    if (chatBody.children.length === 0) {
     showWelcomeCard();
  }
+
+ setTimeout(() => {
+    showMobileProfileNotice();
+ }, 120);
 
 });
 
@@ -2453,22 +2889,129 @@ function closeMobileProfile() {
     mobileProfileEditor.classList.remove("active");
 }
 
-function showMobileProfileNotice() {
-    const hasProfile = Boolean(getSavedProfilePhoto() || getSavedProfileName());
-    const dismissed = sessionStorage.getItem(PROFILE_NOTICE_DISMISSED_KEY) === "true";
+function getProfileSetupState() {
+    const hasName = Boolean(getSavedProfileName().trim());
+    const hasPhoto = Boolean(getSavedProfilePhoto());
 
-    if (!hasProfile && !dismissed) {
-        mobileProfileNotice.classList.add("active");
-        mobileProfileNotice.setAttribute("aria-hidden", "false");
+    return {
+        hasName,
+        hasPhoto,
+        complete: hasName && hasPhoto
+    };
+}
+
+
+function showMobileProfileNotice() {
+
+    const notice = mobileProfileNotice;
+
+    if (!notice) {
+        return;
     }
+
+    const {
+        hasName,
+        hasPhoto,
+        complete
+    } = getProfileSetupState();
+
+    const title = document.getElementById("profileNoticeTitle");
+    const message = document.getElementById("profileNoticeMessage");
+
+    if (complete) {
+        notice.classList.remove("active", "closing");
+        notice.setAttribute("aria-hidden", "true");
+        return;
+    }
+
+    if (!hasName && !hasPhoto) {
+
+        title.textContent = "Set up your profile";
+
+        message.textContent =
+            "Add your name and profile photo to personalize your chat.";
+
+    } else if (hasName && !hasPhoto) {
+
+        title.textContent = "Add your profile photo";
+
+        message.textContent =
+            "Your name is saved. Add a photo to complete your profile.";
+
+    } else if (!hasName && hasPhoto) {
+
+        title.textContent = "Add your name";
+
+        message.textContent =
+            "Your photo is saved. Add your name to complete your profile.";
+    }
+
+    notice.classList.remove("closing");
+
+    // Force the opening animation to restart every bot entry.
+    void notice.offsetWidth;
+
+    notice.classList.add("active");
+
+    notice.setAttribute("aria-hidden", "false");
 }
 
 function dismissMobileProfileNotice() {
-    if (!mobileProfileNotice.classList.contains("active")) return;
-    sessionStorage.setItem(PROFILE_NOTICE_DISMISSED_KEY, "true");
-    mobileProfileNotice.classList.remove("active");
-    mobileProfileNotice.setAttribute("aria-hidden", "true");
+
+    const notice = mobileProfileNotice;
+
+    if (!notice || !notice.classList.contains("active")) {
+        return;
+    }
+
+    notice.classList.remove("active");
+    notice.classList.add("closing");
+
+    setTimeout(() => {
+
+        notice.classList.remove("closing");
+
+        notice.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+    }, 390);
 }
+
+profileNoticeSkip?.addEventListener("click", (event) => {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    dismissMobileProfileNotice();
+
+});
+
+
+profileNoticeSetup?.addEventListener("click", (event) => {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    dismissMobileProfileNotice();
+
+    setTimeout(() => {
+
+        mobileProfilePanel.classList.add("active");
+
+        mobileProfilePanel.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        mobileProfileEditor.classList.add("active");
+
+        mobileProfileNameInput.focus();
+
+    }, 260);
+
+});
 
 mobileMenuToggle.addEventListener("click", () => {
     const isOpen = mobileChatMenu.classList.toggle("active");
@@ -2546,7 +3089,12 @@ mobileProfileEditor.addEventListener("submit", event => {
   }
 
   closeMobileProfile();
-  dismissMobileProfileNotice();
+
+  if (getProfileSetupState().complete) {
+    dismissMobileProfileNotice();
+  } else {
+    showMobileProfileNotice();
+  }
   });
 
 document.addEventListener("click", event => {
@@ -2555,9 +3103,6 @@ document.addEventListener("click", event => {
     }
     if (event.target === mobileProfilePanel) {
         closeMobileProfile();
-    }
-    if (mobileProfileNotice.classList.contains("active") && !event.target.closest("#mobileProfileNotice")) {
-        dismissMobileProfileNotice();
     }
 });
 
