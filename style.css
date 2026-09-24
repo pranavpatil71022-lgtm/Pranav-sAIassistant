@@ -3267,47 +3267,77 @@ body.chat-open .chat-body{
    MOBILE PROFILE NOTIFICATION — RESPONSIVE OVERRIDES
    ========================================================= */
 
-@media (max-width:600px){
+@media (max-width: 600px) {
 
-    .profile-notice{
-        top:70px;
-        right:10px;
-
-        width:min(
-            300px,
-            calc(100vw - 20px)
-        );
-
-        padding:13px;
-
-        border-radius:16px;
+    /* 1. Dynamic Anchoring & Redesign */
+    .profile-notice-anchor .profile-notice {
+        position: absolute !important;
+        top: calc(100% + 12px) !important; /* Anchors exactly below the profile button */
+        right: 0 !important; /* Aligns with the right edge of the anchor */
+        left: auto !important;
+        
+        width: 280px !important; /* Compact width for mobile */
+        padding: 14px !important;
+        
+        /* Modern Glassmorphism */
+        background: rgba(20, 24, 42, 0.85) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(167, 139, 250, 0.3) !important;
+        border-radius: 16px !important;
+        
+        transform-origin: top right !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(124, 58, 237, 0.15) !important;
     }
 
-    .profile-notice-icon{
-        width:36px;
-        height:36px;
-        min-width:36px;
-
-        border-radius:11px;
-
-        font-size:17px;
+    /* 2. Fix the directional arrow */
+    .profile-notice-anchor .profile-notice-arrow {
+        top: -6px !important;
+        right: 14px !important; /* Points exactly at the profile icon */
+        width: 12px !important;
+        height: 12px !important;
+        
+        background: rgba(20, 24, 42, 0.95) !important;
+        border-left: 1px solid rgba(167, 139, 250, 0.3) !important;
+        border-top: 1px solid rgba(167, 139, 250, 0.3) !important;
+        transform: rotate(45deg) !important;
     }
 
-    .profile-notice-copy strong{
-        font-size:12px;
+    /* 3. Refine inner spacing and typography */
+    .profile-notice-content {
+        gap: 10px !important;
     }
 
-    .profile-notice-copy span{
-        font-size:10px;
+    .profile-notice-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        font-size: 16px !important;
+        border-radius: 10px !important;
+    }
+
+    .profile-notice-copy strong {
+        font-size: 13px !important;
+        letter-spacing: 0 !important;
+    }
+
+    .profile-notice-copy span {
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+        color: #c7d2fe !important;
+    }
+
+    /* 4. Streamline Action Buttons */
+    .profile-notice-actions {
+        margin-top: 10px !important;
+        gap: 8px !important;
     }
 
     .profile-notice-primary,
-    .profile-notice-skip{
-        height:32px;
-
-        font-size:10px;
-
-        padding:0 12px;
+    .profile-notice-skip {
+        height: 34px !important;
+        font-size: 11px !important;
+        border-radius: 10px !important;
     }
 }
 
@@ -4750,7 +4780,7 @@ body.chat-open .chat-body{
   padding:7px 16px calc(10px + env(safe-area-inset-bottom)) !important;
   text-align:center !important;
   color:#68738f !important;
-  font-size:11px !important;
+  font: size 13px !important;
   line-height:1.35 !important;
   letter-spacing:.15px !important;
   border-top:0 !important;
@@ -8637,4 +8667,224 @@ body.chat-open .chat-body{
         font-size: 14px;
         line-height: 1.6;
     }
+}
+
+/* Hide the 3-dot mobile menu */
+.chat-widget #mobileMenuToggle {
+    display: none !important;
+}
+
+/* Show the Refresh (Reset) button and match the dimensions */
+.chat-widget #resetChat {
+    display: flex !important;
+    order: 2 !important; 
+    
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    
+    align-items: center !important;
+    justify-content: center !important;
+    
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+}
+
+/* Adjust size for mobile screens */
+@media (max-width: 600px) {
+    .chat-widget #resetChat {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+    }
+}
+
+/* Force the profile photo container to be a perfect circle */
+.chat-widget .profile-avatar-control {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    flex: 0 0 42px !important; /* Prevents flexbox from squishing it */
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 2px !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure the image inside strictly follows the circular bounds */
+.chat-widget .profile-avatar-preview,
+.chat-widget .profile-avatar-preview img,
+.chat-widget .user-profile-photo {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+/* Keep it perfectly circular on mobile screens too */
+@media (max-width: 600px) {
+    .chat-widget .profile-avatar-control {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        flex: 0 0 36px !important;
+    }
+}
+
+/* =========================================================
+   PREMIUM PROFILE MODAL REDESIGN
+   ========================================================= */
+
+/* Hide redundant buttons since everything is inline and auto-saves */
+#mobileEditProfile,
+#mobileProfileSave {
+    display: none !important;
+}
+
+/* Make the editor always visible and seamlessly integrated */
+.chat-widget .mobile-profile-editor {
+    display: block !important;
+    width: 100% !important;
+    margin: 15px 0 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+/* Premium input styling */
+.chat-widget .mobile-profile-editor label {
+    color: #aeb7cf !important;
+    font-size: 12px !important;
+    margin-bottom: 8px !important;
+}
+
+.chat-widget .mobile-profile-editor input {
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 12px 16px !important;
+    
+    background: rgba(15, 20, 35, 0.6) !important;
+    border: 1px solid rgba(167, 139, 250, 0.25) !important;
+    border-radius: 12px !important;
+    
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.chat-widget .mobile-profile-editor input:focus {
+    border-color: rgba(167, 139, 250, 0.8) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), 0 4px 12px rgba(0,0,0,0.2) !important;
+}
+
+/* Clean up action buttons layout */
+.chat-widget .mobile-profile-editor-actions {
+    display: flex !important;
+    margin-top: 12px !important;
+}
+
+.chat-widget .mobile-profile-editor-actions button {
+    flex: 1 !important;
+    min-height: 48px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #6d28d9, #8b5cf6) !important;
+    border: 1px solid rgba(196, 181, 253, 0.38) !important;
+    color: #fff !important;
+}
+
+/* Update Remove Profile button to look like a secondary action */
+.chat-widget .mobile-profile-actions {
+    margin-top: 8px !important;
+}
+
+.chat-widget #mobileRemoveProfile {
+    min-height: 44px !important;
+    background: transparent !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    color: #fca5a5 !important;
+}
+
+.chat-widget #mobileRemoveProfile:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ffc4ca !important;
+}
+
+/* =========================================================
+   PROFILE MODAL: DESKTOP FIX & AVATAR UPLOAD DESIGN
+   ========================================================= */
+
+/* 1. Prevent elements from stretching across the screen on desktop */
+.chat-widget .mobile-profile-card,
+.chat-widget .mobile-profile-actions,
+.chat-widget .mobile-profile-editor {
+    width: 100% !important;
+    max-width: 380px !important; /* Locks width so it looks good on PC and Mobile */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 2. Hide the old bulky "Add Photo" button */
+.chat-widget #mobileProfilePhoto {
+    display: none !important;
+}
+
+/* 3. Redesign the Avatar to act as the upload button */
+.chat-widget .mobile-profile-card .profile-avatar-preview {
+    position: relative !important;
+    cursor: pointer !important;
+    overflow: visible !important; /* Allows the + badge to pop out slightly */
+    transition: transform 0.2s ease !important;
+}
+
+.chat-widget .mobile-profile-card .profile-avatar-preview:active {
+    transform: scale(0.94) !important;
+}
+
+/* Ensure the image/SVG itself stays perfectly round */
+.chat-widget .mobile-profile-card .profile-avatar-preview img,
+.chat-widget .mobile-profile-card .profile-avatar-preview svg {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* 4. Add the floating "+" icon badge to the bottom right of the avatar */
+.chat-widget .mobile-profile-card .profile-avatar-preview::after {
+    content: "+";
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+    border: 3px solid #14172a; /* Matches the modal background to create a cutout effect */
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, background 0.2s ease;
+    z-index: 10;
+}
+
+.chat-widget .mobile-profile-card .profile-avatar-preview:hover::after {
+    transform: scale(1.15);
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
 }

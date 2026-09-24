@@ -3191,57 +3191,26 @@ function getProfileSetupState() {
 
 
 function showMobileProfileNotice() {
-
     const notice = mobileProfileNotice;
+    if (!notice) return;
 
-    if (!notice) {
-        return;
-    }
-
-    const {
-        hasName,
-        hasPhoto,
-        complete
-    } = getProfileSetupState();
-
+    const hasPhoto = Boolean(getSavedProfilePhoto());
     const title = document.getElementById("profileNoticeTitle");
     const message = document.getElementById("profileNoticeMessage");
 
-    if (complete) {
+    // If they have a photo, never show the notification
+    if (hasPhoto) {
         notice.classList.remove("active", "closing");
         notice.setAttribute("aria-hidden", "true");
         return;
     }
 
-    if (!hasName && !hasPhoto) {
-
-        title.textContent = "Set up your profile";
-
-        message.textContent =
-            "Add your name and profile photo to personalize your chat.";
-
-    } else if (hasName && !hasPhoto) {
-
-        title.textContent = "Add your profile photo";
-
-        message.textContent =
-            "Your name is saved. Add a photo to complete your profile.";
-
-    } else if (!hasName && hasPhoto) {
-
-        title.textContent = "Add your name";
-
-        message.textContent =
-            "Your photo is saved. Add your name to complete your profile.";
-    }
+    title.textContent = "Add a profile photo";
+    message.textContent = "Personalize your chat with a profile picture.";
 
     notice.classList.remove("closing");
-
-    // Force the opening animation to restart every bot entry.
-    void notice.offsetWidth;
-
+    void notice.offsetWidth; // force reflow
     notice.classList.add("active");
-
     notice.setAttribute("aria-hidden", "false");
 }
 
@@ -3340,8 +3309,9 @@ mobileEditProfile.addEventListener("click", () => {
     mobileProfileNameInput.focus();
 });
 mobileRemoveProfile.addEventListener("click", removeLocalProfile);
-mobileProfileEditor.addEventListener("submit", event => {
-    event.preventDefault();
+
+// Auto-save name as user types
+mobileProfileNameInput.addEventListener("input", () => {
     const name = mobileProfileNameInput.value.trim();
 
     if (name) {
@@ -3350,41 +3320,27 @@ mobileProfileEditor.addEventListener("submit", event => {
         localStorage.removeItem(PROFILE_NAME_STORAGE_KEY);
     }
 
-    updateProfilePhotoUI();
-
-   const welcomeGreeting = document.querySelector(".welcome-card .welcome-greeting");
-
-  if (welcomeGreeting) {
-    const savedName = getSavedProfileName();
-    const displayName = savedName
-        ? `, ${escapeHtml(savedName)}`
-        : "";
-
-    const currentHour = new Date().getHours();
-
-    let timeGreeting;
-
-    if (currentHour >= 5 && currentHour < 12) {
-        timeGreeting = "Good morning";
-    } else if (currentHour >= 12 && currentHour < 17) {
-        timeGreeting = "Good afternoon";
-    } else if (currentHour >= 17 && currentHour < 21) {
-        timeGreeting = "Good evening";
-    } else {
-        timeGreeting = "Good night";
+    // Live update the text in the profile panel
+    if (mobileProfileName) {
+        mobileProfileName.textContent = name || "Your profile";
     }
 
-    welcomeGreeting.innerHTML = `${timeGreeting}${displayName} 👋`;
-  }
+    // Live update the welcome screen greeting
+    const welcomeGreeting = document.querySelector(".welcome-card .welcome-greeting");
+    if (welcomeGreeting) {
+        const displayName = name ? `, ${escapeHtml(name)}` : "";
+        const currentHour = new Date().getHours();
+        let timeGreeting = "Good night";
+        if (currentHour >= 5 && currentHour < 12) timeGreeting = "Good morning";
+        else if (currentHour >= 12 && currentHour < 17) timeGreeting = "Good afternoon";
+        else if (currentHour >= 17 && currentHour < 21) timeGreeting = "Good evening";
+        
+        welcomeGreeting.innerHTML = `${timeGreeting}${displayName} 👋`;
+    }
+});
 
-  closeMobileProfile();
-
-  if (getProfileSetupState().complete) {
-    dismissMobileProfileNotice();
-  } else {
-    showMobileProfileNotice();
-  }
-  });
+// Prevent form submission since we auto-save
+mobileProfileEditor.addEventListener("submit", (e) => e.preventDefault());
 
 document.addEventListener("click", event => {
     if (!event.target.closest(".chat-header-right")) {
@@ -3705,3 +3661,32 @@ window.addEventListener("popstate", (event) => {
         chatBody.scrollTop = chatBody.scrollHeight;
     }, 50);
 });
+
+// Make the profile avatar button open the profile panel
+const profileAvatarBtn = document.getElementById('profileAvatarControl');
+
+if (profileAvatarBtn) {
+    profileAvatarBtn.addEventListener('click', () => {
+        // Close the 3-dot menu if it was somehow open
+        closeMobileMenu(); 
+        
+        // Hide the "Set up your profile" popup notice if it is visible
+        dismissMobileProfileNotice(); 
+        
+        // Open the profile editing panel
+        mobileProfilePanel.classList.add("active");
+        mobileProfilePanel.setAttribute("aria-hidden", "false");
+    });
+}
+
+// Make the avatar inside the modal clickable to upload a photo
+const modalAvatar = document.getElementById("mobileProfileAvatarPreview");
+
+if (modalAvatar) {
+    modalAvatar.addEventListener("click", () => {
+        const profilePhotoInput = document.getElementById("profilePhotoInput");
+        if (profilePhotoInput) {
+            profilePhotoInput.click();
+        }
+    });
+}
