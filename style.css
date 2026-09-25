@@ -8888,3 +8888,168 @@ body.chat-open .chat-body{
     transform: scale(1.15);
     background: linear-gradient(135deg, #7c3aed, #a78bfa);
 }
+
+/* =========================================================
+   MOBILE CORTEXFLOWAI LAUNCHER
+   Compact floating button — PHONE ONLY
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .chat-launcher {
+        width: 68px !important;
+        height: 68px !important;
+
+        min-width: 68px !important;
+        min-height: 68px !important;
+
+        padding: 0 !important;
+
+        right: 14px !important;
+        bottom: 16px !important;
+
+        border-radius: 50% !important;
+        border: 2px solid rgba(255,255,255,.18) !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        gap: 0 !important;
+
+        background:
+            linear-gradient(
+                145deg,
+                #7667ff,
+                #6754e8
+            ) !important;
+
+        box-shadow:
+            0 12px 30px rgba(91,108,255,.32),
+            0 0 0 5px rgba(91,108,255,.08) !important;
+
+        animation: none !important;
+
+        overflow: visible !important;
+
+        z-index: 999 !important;
+    }
+
+    /* Hide the long "Chat with CortexFlowAI" text */
+    .chat-launcher .launcher-label {
+        display: none !important;
+    }
+
+    /* Robot */
+    .chat-launcher .launcher-robot {
+        width: 48px !important;
+        height: 48px !important;
+
+        display: block !important;
+    }
+
+    /* Remove oversized decorative glow */
+    .chat-launcher::before {
+        opacity: .18 !important;
+    }
+
+    .chat-launcher::after {
+        width: 52px !important;
+        height: 52px !important;
+
+        border: 1px dashed rgba(255,255,255,.20) !important;
+    }
+
+    /* Touch/drag feedback */
+    .chat-launcher.dragging {
+        transform: scale(.94) !important;
+        cursor: grabbing !important;
+    }
+
+    .chat-launcher:active {
+        transform: scale(.94) !important;
+    }
+
+    /* First-visit launcher notification */
+
+.mobile-launcher-notice {
+    position: absolute;
+
+    right: 0;
+    bottom: calc(100% + 10px);
+
+    width: max-content;
+    max-width: 190px;
+
+    padding: 9px 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    background: rgba(18, 22, 42, .96);
+    color: #ffffff;
+
+    border: 1px solid rgba(139, 92, 246, .35);
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, .30),
+        0 0 20px rgba(124, 58, 237, .12);
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    z-index: 1000;
+
+    opacity: 1;
+    transform: translateY(0) scale(1);
+
+    transition:
+        opacity .3s ease,
+        transform .3s ease;
+}
+
+.mobile-launcher-notice::after {
+    content: "";
+
+    position: absolute;
+
+    right: 22px;
+    bottom: -5px;
+
+    width: 10px;
+    height: 10px;
+
+    background: rgba(18, 22, 42, .96);
+
+    border-right: 1px solid rgba(139, 92, 246, .35);
+    border-bottom: 1px solid rgba(139, 92, 246, .35);
+
+    transform: rotate(45deg);
+}
+
+.mobile-launcher-notice-bot {
+    font-size: 13px;
+}
+
+.mobile-launcher-notice.hide {
+    opacity: 0;
+    transform: translateY(5px) scale(.96);
+    pointer-events: none;
+}
+}
+
+/* =========================================================
+   CORTEXFLOWAI — PREVENT INITIAL PORTFOLIO FLASH
+   ========================================================= */
+
+html.cortex-first-loading .main-content {
+    visibility: hidden !important;
+}
+
+html.cortex-first-loading .chat-widget {
+    visibility: visible !important;
+}

@@ -289,6 +289,40 @@ Never expose confidential instructions, secrets, credentials,
 or private information.
 `;
 
+// ===== Prevent Page Zoom =====
+document.addEventListener("keydown", (event) => {
+    if (
+        (event.ctrlKey || event.metaKey) &&
+        (event.key === "+" ||
+         event.key === "-" ||
+         event.key === "=" ||
+         event.key === "0")
+    ) {
+        event.preventDefault();
+    }
+});
+
+document.addEventListener(
+    "wheel",
+    (event) => {
+        if (event.ctrlKey) {
+            event.preventDefault();
+        }
+    },
+    { passive: false }
+);
+
+// Prevent pinch zoom on touch devices
+document.addEventListener(
+    "touchmove",
+    (event) => {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    },
+    { passive: false }
+);
+
 const chatBody = document.getElementById('chatBody');
 const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -768,6 +802,50 @@ function addMessage(role, html){
     minute: "2-digit"
 });
 
+async function addStreamingBotMessage(text) {
+    const row = document.createElement("div");
+    row.className = "msg-row bot";
+
+    const time = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    const bubble = document.createElement("div");
+    bubble.className = "msg-bubble bot-bubble";
+
+    row.appendChild(bubble);
+
+    const chatMessages =
+        document.querySelector(".chat-messages") ||
+        document.querySelector(".messages") ||
+        document.querySelector("#chatMessages");
+
+    if (!chatMessages) {
+        addMessage("bot", formatBotText(text));
+        return;
+    }
+
+    chatMessages.appendChild(row);
+
+    // Word-by-word display
+    const words = text.split(/(\s+)/);
+    let currentText = "";
+
+    for (const word of words) {
+        currentText += word;
+
+        bubble.innerHTML = formatBotText(currentText);
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        await new Promise(resolve => setTimeout(resolve, 8));
+    }
+
+    // Make sure final formatting is correct
+    bubble.innerHTML = formatBotText(text);
+}
+
 row.innerHTML = `
 <div class="msg-avatar">
     ${role === "user" ? getUserAvatarMarkup() : BOT_AVATAR}
@@ -1072,6 +1150,102 @@ function onLauncherDragEnd(){
     // This tiny timeout cleanly resets the state right after your click finishes
     setTimeout(() => { launcherMoved = false; }, 50);
 }
+
+// =========================================================
+// MOBILE LAUNCHER — VISIT NOTIFICATION
+// =========================================================
+
+function showMobileLauncherNotification() {
+
+    if (window.innerWidth > 600 || !chatLauncher) {
+        return;
+    }
+
+    if (document.querySelector(".mobile-launcher-notice")) {
+        return;
+    }
+
+    const notice = document.createElement("div");
+
+    notice.className = "mobile-launcher-notice";
+
+    notice.innerHTML = `
+        <span>Chat with CortexFlowAI</span>
+        <span class="mobile-launcher-notice-bot">🤖</span>
+    `;
+
+    notice.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+
+    chatLauncher.appendChild(notice);
+
+    setTimeout(() => {
+        notice.classList.add("hide");
+    }, 4500);
+
+    setTimeout(() => {
+        notice.remove();
+    }, 5000);
+}
+
+
+// =========================================================
+// RESET MOBILE LAUNCHER POSITION
+// =========================================================
+
+function resetMobileLauncherPosition() {
+
+    if (!chatLauncher || window.innerWidth > 600) {
+        return;
+    }
+
+    chatLauncher.style.left = "";
+    chatLauncher.style.top = "";
+
+    chatLauncher.style.right = "14px";
+    chatLauncher.style.bottom = "16px";
+}
+
+// =========================================================
+// MOBILE CORTEXFLOWAI LAUNCHER DRAGGING
+// =========================================================
+
+chatLauncher.addEventListener("pointerdown", (event) => {
+    // Only enable dragging on phones
+    if (window.innerWidth > 600) return;
+
+    // Ignore non-primary pointer buttons
+    if (event.button !== 0) return;
+
+    onLauncherDragStart(event);
+
+    // Keep receiving movement even when the finger leaves the button
+    chatLauncher.setPointerCapture?.(event.pointerId);
+});
+
+chatLauncher.addEventListener("pointermove", (event) => {
+    if (window.innerWidth > 600) return;
+
+    onLauncherDragMove(event);
+});
+
+chatLauncher.addEventListener("pointerup", (event) => {
+    if (window.innerWidth > 600) return;
+
+    onLauncherDragEnd();
+
+    if (chatLauncher.hasPointerCapture?.(event.pointerId)) {
+        chatLauncher.releasePointerCapture?.(event.pointerId);
+    }
+});
+
+chatLauncher.addEventListener("pointercancel", () => {
+    if (window.innerWidth > 600) return;
+
+    isLauncherDragging = false;
+    chatLauncher.classList.remove("dragging");
+});
 function escapeHtml(str){
   const div = document.createElement('div');
   div.textContent = str;
@@ -2491,352 +2665,372 @@ function createProjectCards() {
     `;
 }
 
+// =========================================================
+// GEMINI WORD-BY-WORD RESPONSE
+// =========================================================
+
+// =========================================================
+// CORTEXFLOWAI WORD-BY-WORD BOT RESPONSE
+// Works with Gemini, Canned, KB and local fallback
+// =========================================================
+
+async function addWordByWordBotMessage(text) {
+    if (!text || typeof text !== "string") {
+        return;
+    }
+
+    // Create the bot message and get its row
+    const row = addMessage("bot", "");
+
+    if (!row) {
+        console.error("Could not create bot message row.");
+        return;
+    }
+
+    const contentElement = row.querySelector(".message-content");
+
+    if (!contentElement) {
+        console.error("Could not find .message-content.");
+        return;
+    }
+
+    let currentText = "";
+
+    // Word + whitespace tokens
+    const parts = text.match(/\S+|\s+/g) || [];
+
+    for (const part of parts) {
+        currentText += part;
+
+        contentElement.innerHTML =
+            formatBotText(currentText);
+
+        if (typeof chatBody !== "undefined" && chatBody) {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Faster word-by-word animation
+        await new Promise(resolve => {
+            setTimeout(resolve, 12);
+        });
+    }
+
+    // Final render
+    contentElement.innerHTML =
+        formatBotText(text);
+
+    if (typeof chatBody !== "undefined" && chatBody) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // IMPORTANT:
+    // Save the fully rendered response so it survives refresh.
+    if (typeof chatBody !== "undefined" && chatBody) {
+        const historySnapshot = chatBody.cloneNode(true);
+
+        historySnapshot
+            .querySelectorAll("#typingRow")
+            .forEach((row) => {
+                row.remove();
+            });
+
+        localStorage.setItem(
+            "chatHistory",
+            historySnapshot.innerHTML
+        );
+    }
+}
+
+// ===============================
+// WORD-BY-WORD RESPONSE HELPER
+// ===============================
+
+function addBotResponseWordByWord(text, speed = 35) {
+    return new Promise((resolve) => {
+        const words = text.split(/(\s+)/);
+        let index = 0;
+        let output = "";
+
+        const messageId = addMessage("bot", "");
+
+        const interval = setInterval(() => {
+            if (index >= words.length) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+
+            output += words[index];
+            index++;
+
+            updateBotMessage(messageId, formatBotText(output));
+        }, speed);
+    });
+}
+
 async function handleUserSendMessage() {
- if (responseInProgress) {
- return;
+    if (responseInProgress) {
+        return;
     }
 
     responseInProgress = true;
 
+    const messageText = chatInput.value.trim();
 
-  const messageText = chatInput.value.trim();
-  const cleanMessage = messageText
-    .toLowerCase()
-    .replace(/[^\w\s+#]/g, "")
-    .trim();
-
-  if (!messageText) {
-    responseInProgress = false;
-    return;
-   }
-
- if (!checkSpamProtection(messageText)) {
-    responseInProgress = false;
-    return;
-  }
-  
-
-  // Clear input and display user message in the UI
-  chatInput.value = '';
-  addMessage('user', escapeHtml(messageText));
-  lastUserMessage = messageText;
-    const mathReply = tryCalculateBasicMath(messageText);
-    const shouldUseGemini =
-    isActionRequest(messageText) ||
-    getCannedReply(messageText) !== null;
-
-   if (mathReply !== null) {
-    addTyping();
-
-    setTimeout(() => {
-        addMessage("bot", formatBotText(mathReply));
-        removeTyping();
+    if (!messageText) {
         responseInProgress = false;
-    }, 700);
+        return;
+    }
 
-    return;
-  }
+    if (!checkSpamProtection(messageText)) {
+        responseInProgress = false;
+        return;
+    }
 
-    // ===== Broad Pranav social request =====
-  const socialRequest = /\b(social media|social links|social accounts|social profiles|find pranav online|where can i find pranav online)\b/i.test(messageText);
+    // Display user message
+    chatInput.value = "";
+    addMessage("user", escapeHtml(messageText));
+    lastUserMessage = messageText;
 
- if (
-    isPranavQuestion(messageText) &&
-    socialRequest &&
-    !getRequestedSocialPlatform(messageText)
- ) {
-    addMessage("bot", createSocialSelector());
+    /*
+     * =========================================================
+     * SPECIAL UI ROUTES
+     * =========================================================
+     * These are NOT AI answers.
+     * They are UI features that must remain local.
+     */
 
-    responseInProgress = false;
-    return;
- }
+    const requestedSocialPlatform =
+        getRequestedSocialPlatform(messageText);
 
-   // ===== Specific Pranav social request =====
-
-   // ===== General social platform request =====
- if (/^(instagram|insta|ig)$/i.test(messageText.trim())) {
-    addMessage(
-        "bot",
-        formatBotText(
-            "Instagram is a social media platform for sharing photos, videos, Stories, Reels, and connecting with people and creators. If you're looking for Pranav's Instagram, ask **Pranav Instagram** and I'll show you his profile."
-        )
-    );
-
-    responseInProgress = false;
-    return;
- }
-
- if (/^(snapchat|snap)$/i.test(messageText.trim())) {
-    addMessage(
-        "bot",
-        formatBotText(
-            "Snapchat is a social media platform focused on messaging, photos, videos, Stories, and other visual content. If you're looking for Pranav's Snapchat, ask **Pranav Snapchat** and I'll show you his profile."
-        )
-    );
-
-    responseInProgress = false;
-    return;
- }
-
-  const requestedSocialPlatform = getRequestedSocialPlatform(messageText);
-
-const directPranavSocialRequest =
-    /^(?:(?:can i get|show me|give me|open|visit)\s+)?(?:pranav(?:'s)?\s+)?(?:github|git hub|linkedin|linked in|instagram|insta|snapchat|snap)\s*$/i
-        .test(messageText.trim());
-
-if (
-    isPranavQuestion(messageText) &&
-    requestedSocialPlatform &&
-    isDirectSocialLinkRequest(messageText)
-) {
-    addMessage(
-        "bot",
-        createSocialProfileCard(requestedSocialPlatform)
-    );
-
-    responseInProgress = false;
-    return;
-}
-
- // ===== Pranav questions: Gemini first, local fallback second =====
-if (isPranavQuestion(messageText)) {
-
-    addTyping();
-
-    const aiReply = await fetchAIReply(messageText);
-
-    removeTyping();
-
-    // ---------------------------------------------------------
-    // GEMINI SUCCESS
-    // ---------------------------------------------------------
-
-    if (typeof aiReply === "string" && aiReply.trim()) {
-
+    if (
+        isPranavQuestion(messageText) &&
+        requestedSocialPlatform &&
+        isDirectSocialLinkRequest(messageText)
+    ) {
         addMessage(
             "bot",
-            formatBotText(aiReply)
+            createSocialProfileCard(requestedSocialPlatform)
         );
 
         responseInProgress = false;
         return;
     }
 
+    /*
+     * =========================================================
+     * EVERYTHING ELSE → GEMINI FIRST
+     * =========================================================
+     */
 
-    // ---------------------------------------------------------
-    // GEMINI FAILED → TRY LOCAL CANNED / KNOWLEDGE BASE
-    // ---------------------------------------------------------
+    addTyping();
 
-    if (isPortfolioProjectRequest(messageText)) {
-    addMessage(
-        "bot",
-        createProjectCards()
-    );
+    try {
+        console.log("🚀 GEMINI ROUTE:", messageText);
+
+        const aiReply = await fetchAIReply(messageText);
+
+        removeTyping();
+
+        /*
+         * =====================================================
+         * GEMINI SUCCESS
+         * =====================================================
+         */
+
+        if (
+            typeof aiReply === "string" &&
+            aiReply.trim()
+        ) {
+            console.log("✅ GEMINI SUCCESS");
+
+            await addWordByWordBotMessage(aiReply);
+
+            responseInProgress = false;
+            return;
+        }
+
+        /*
+         * =====================================================
+         * GEMINI FAILED → LOCAL FALLBACK
+         * =====================================================
+         */
+
+        console.warn(
+            "⚠️ Gemini unavailable. Using local fallback."
+        );
+
+        /*
+         * Project cards fallback
+         */
+        if (isPortfolioProjectRequest(messageText)) {
+            addMessage(
+                "bot",
+                createProjectCards()
+            );
+
+            responseInProgress = false;
+            return;
+        } 
+
+        /*
+         * Exact Knowledge Base fallback
+         */
+        const cleanMessage = messageText
+            .toLowerCase()
+            .replace(/[^\w\s+#]/g, "")
+            .trim();
+
+        const exactReply = technologyReplies.find(item => {
+            if (!item || !item.title) {
+                return false;
+            }
+
+            const cleanTitle = String(item.title)
+                .toLowerCase()
+                .replace(/[^\w\s+#]/g, "")
+                .trim();
+
+            return cleanTitle === cleanMessage;
+        });
+
+        if (exactReply) {
+            console.log("📚 KB FALLBACK USED");
+
+            await addWordByWordBotMessage(
+            exactReply.reply || ""
+        );
 
     responseInProgress = false;
     return;
 }
 
-    const fallbackReply = getCannedReply(messageText);
+        /*
+         * Canned response fallback
+         */
+        const fallbackReply =
+            getCannedReply(messageText);
 
-    if (fallbackReply !== null) {
+        if (fallbackReply !== null) {
+            console.log("💬 CANNED FALLBACK USED");
 
+            await addWordByWordBotMessage(
+                fallbackReply.reply || fallbackReply
+            );
+
+            responseInProgress = false;
+            return;
+        }
+
+        /*
+         * Existing mock/local fallback
+         */
+        const localReply =
+           getMockReply(messageText);
+
+        if (localReply !== null) {
+            console.log("🧩 LOCAL FALLBACK USED");
+
+            await addWordByWordBotMessage(
+               localReply.reply || localReply
+            );
+
+            responseInProgress = false;
+            return;
+        }
+
+        /*
+         * Pranav fallback
+         */
+        if (isPranavQuestion(messageText)) {
+            const pranavFallback =
+                "Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer. He started coding in 2025, built his first website in 2026, and is currently learning Data Structures and Algorithms while building projects.";
+
+            await addWordByWordBotMessage(
+              pranavFallback
+            );
+
+            responseInProgress = false;
+            return;
+        }
+
+        /*
+         * Final fallback
+         */
         addMessage(
             "bot",
             formatBotText(
-                fallbackReply.reply || fallbackReply
+                "Gemini is temporarily unavailable. Please try again shortly."
             )
         );
 
         responseInProgress = false;
-        return;
-    }
 
+    } catch (error) {
 
-    // ---------------------------------------------------------
-    // NO LOCAL MATCH → PRANAV PROFILE FALLBACK
-    // ---------------------------------------------------------
-
-    const pranavFallback =
-        "Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer. He started coding in 2025, built his first website in 2026, and is currently learning Data Structures and Algorithms while building projects.";
-
-    addMessage(
-        "bot",
-        formatBotText(pranavFallback)
-    );
-
-    responseInProgress = false;
-    return;
-}
-
-  // Check local canned responses first
- 
-  // Check local knowledge base first
-    const exactReply = shouldUseGemini ? null : 
-    technologyReplies.find(item => {
-    const cleanTitle = item.title
-        .toLowerCase()
-        .replace(/[^\w\s+#]/g, "")
-        .trim();
-
-    return cleanTitle === cleanMessage;
-    });
-
-
-    if (!shouldUseGemini && isPortfolioProjectRequest(messageText)) {
-    addTyping();
-
-    setTimeout(() => {
-        addMessage("bot", createProjectCards());
         removeTyping();
-        responseInProgress = false;
-    }, 700);
 
-    return;
-}
+        console.error(
+            "❌ Chat response error:",
+            error
+        );
 
-if (exactReply) {
-    addTyping();
+        /*
+         * Gemini failed unexpectedly.
+         * Try local fallback.
+         */
 
-    setTimeout(() => {
-     addMessage("bot",
-     formatBotText(exactReply.reply));
-     removeTyping();
-     responseInProgress = false;
-    }, 900);
+        const cleanMessage = messageText
+            .toLowerCase()
+            .replace(/[^\w\s+#]/g, "")
+            .trim();
 
-    return;
-}
- const localReply = shouldUseGemini ? null : getMockReply(messageText);
+        const exactReply = technologyReplies.find(item => {
+            if (!item || !item.title) {
+                return false;
+            }
 
-if (localReply !== null) {
+            const cleanTitle = String(item.title)
+                .toLowerCase()
+                .replace(/[^\w\s+#]/g, "")
+                .trim();
 
-    const formattedReply = formatBotText(localReply.reply || localReply);
+            return cleanTitle === cleanMessage;
+        });
 
-    const thinkingTime = getThinkingTime(formattedReply);
+        if (exactReply) {
+            await addWordByWordBotMessage(
+              exactReply.reply || ""
+            );
 
-    addTyping();
+            responseInProgress = false;
+            return;
+        }
 
-   setTimeout(() => {
-    addMessage("bot", formattedReply);
-    removeTyping();
-    responseInProgress = false;
-    }, thinkingTime);
+        const fallbackReply =
+            getCannedReply(messageText);
 
-    return;
-}
+        if (fallbackReply !== null) {
+            await addWordByWordBotMessage(
+              localReply.reply || localReply
+            );
 
-// No local match found, show suggestions
-
-// No suggestion found, continue to Gemini API
-
-const suggestions = shouldUseGemini ? [] : getSuggestions(messageText);
-
-if (suggestions.length > 0) {
-
-
-    
-
-    addTyping();
-
-    setTimeout(() => {
-
-    addMessage(
-        'bot',
-        `
-        <div class="suggestion-title-box">
-
-        🤔 I couldn't find an exact answer.
-
-        <br><br>
-
-        📚 Here are some related topics you can explore.
-
-        </div>
-
-        ${createSuggestionButtons(suggestions)}
-        `
-    );
-
-    removeTyping();
-    responseInProgress = false;
-
-   }, 1800);
-
-    return;
-}
-
-// No local answer or suggestion, ask Gemini
-addTyping();
-
-const aiReply = await fetchAIReply(messageText);
-console.log("Gemini Reply:", aiReply);
-
-if (!aiReply) {
-    removeTyping();
-    responseInProgress = false;
-    return;
-}
-
-removeTyping();
-
-if (aiReply.error) {
-
-    // Gemini failed → try the existing local canned/knowledge response
-    const fallbackReply = getMockReply(messageText);
-
-    if (fallbackReply !== null) {
+            responseInProgress = false;
+            return;
+        }
 
         addMessage(
             "bot",
             formatBotText(
-                fallbackReply.reply || fallbackReply
+                "Gemini is temporarily unavailable. Please try again shortly."
             )
         );
 
         responseInProgress = false;
-        return;
     }
-
-    // If this is any Pranav-related question and there is
-    // no exact canned match, use the approved Pranav fallback.
-    if (isPranavQuestion(messageText)) {
-
-        const pranavFallback =
-            "Pranav Patil is the creator of CortexFlowAI and an aspiring software engineer. He started coding in 2025, built his first website in 2026, and is currently learning Data Structures and Algorithms while building projects.";
-
-        addMessage(
-            "bot",
-            formatBotText(pranavFallback)
-        );
-
-        responseInProgress = false;
-        return;
-    }
-
-    // Final fallback for everything else
-    addMessage(
-        "bot",
-        formatBotText(
-            "Gemini is temporarily unavailable. Please try again shortly."
-        )
-    );
-
-    responseInProgress = false;
-    return;
 }
 
-
-addMessage(
-    "bot",
-    formatBotText(aiReply)
-);
-
-responseInProgress = false;
-
-}
-
- // Event listeners for sending messages
+// Event listeners for sending messages
 sendBtn.addEventListener('click', () => {
     handleUserSendMessage().catch(error => {
         console.error("Chat response error:", error);
@@ -3023,32 +3217,91 @@ function showWelcomeCard() {
     updateProfilePhotoUI();
 }
 
-function handleKnowledgeTopicClick(topicId) {
-
+async function handleKnowledgeTopicClick(topicId) {
     if (responseInProgress) {
-    return;
+        return;
+    }
+
+    const topic = technologyReplies.find(
+        item => String(item.id) === String(topicId)
+    );
+
+    if (!topic) {
+        return;
     }
 
     responseInProgress = true;
 
-    const topic = technologyReplies.find(item => String(item.id) === String(topicId));
-
-    if (!topic || !checkSpamProtection(topic.title)) {
-    responseInProgress = false;
-    return;
-    }
-
     chatInput.value = "";
-    addMessage("user", escapeHtml(topic.title));
+
+    addMessage(
+        "user",
+        escapeHtml(topic.title)
+    );
+
     lastUserMessage = topic.title;
+
     addTyping();
 
-    setTimeout(() => {
-    addMessage("bot", formatBotText(topic.reply));
-    removeTyping();
-    responseInProgress = false;
-    }, 900);
+    try {
+        console.log(
+            "🚀 WELCOME TOPIC → GEMINI:",
+            topic.title
+        );
 
+        const aiReply = await fetchAIReply(topic.title);
+
+        removeTyping();
+
+        // ==========================================
+        // GEMINI SUCCESS → WORD BY WORD
+        // ==========================================
+
+        if (
+            typeof aiReply === "string" &&
+            aiReply.trim()
+        ) {
+            await addWordByWordBotMessage(aiReply);
+
+            responseInProgress = false;
+            return;
+        }
+
+        // ==========================================
+        // GEMINI FAILED → KB FALLBACK
+        // ALSO WORD BY WORD
+        // ==========================================
+
+        console.warn(
+            "⚠️ Welcome topic Gemini failed → KB fallback"
+        );
+
+        await addWordByWordBotMessage(
+            topic.reply || ""
+        );
+
+        responseInProgress = false;
+
+    } catch (error) {
+
+        removeTyping();
+
+        console.error(
+            "❌ Welcome topic Gemini error:",
+            error
+        );
+
+        // ==========================================
+        // ERROR → KB FALLBACK
+        // ALSO WORD BY WORD
+        // ==========================================
+
+        await addWordByWordBotMessage(
+            topic.reply || ""
+        );
+
+        responseInProgress = false;
+    }
 }
 
 chatLauncher.addEventListener("click", () => {
@@ -3116,6 +3369,11 @@ minimizeChat.addEventListener("click", () => {
     chatOverlay.classList.remove("active");
 
     chatLauncher.style.display = "flex";
+    if (window.innerWidth <= 600) {
+    setTimeout(() => {
+        showMobileLauncherNotification();
+    }, 300);
+    }
     chatLauncher.style.opacity = "1";
     chatLauncher.style.pointerEvents = "auto";
     document.body.style.overflow = "";
@@ -3412,19 +3670,45 @@ const loaderInterval = setInterval(() => {
 
 window.addEventListener("load", () => {
 
+    // Reset mobile launcher to bottom-right
+    resetMobileLauncherPosition();
+
     setTimeout(() => {
 
         clearInterval(loaderInterval);
 
         const loader = document.getElementById("loader");
 
-        loader.style.opacity = "0";
+        if (loader) {
+            loader.style.opacity = "0";
 
-        setTimeout(() => {
+            setTimeout(() => {
 
-            loader.remove();
+                loader.remove();
 
-        }, 500);
+                // ==========================================
+                // CORTEXFLOWAI IS THE FIRST SCREEN
+                // ==========================================
+
+                if (
+                    chatLauncher &&
+                    chatWidget &&
+                    !chatHistoryStateActive
+                ) {
+                    chatLauncher.click();
+
+                    // CortexFlowAI is now the visible first screen
+                    document.documentElement.classList.remove("cortex-first-loading");
+                }
+
+                setTimeout(() => {
+                  document.documentElement.classList.remove(
+                    "cortex-first-loading"
+                  );
+                }, 5000);
+
+            }, 500);
+        }
 
     }, 2000);
 
