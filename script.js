@@ -2702,22 +2702,20 @@ async function addWordByWordBotMessage(text) {
     for (const part of parts) {
         currentText += part;
 
-        contentElement.innerHTML =
-            formatBotText(currentText);
+        // Lightweight progressive rendering
+        contentElement.textContent = currentText;
 
         if (typeof chatBody !== "undefined" && chatBody) {
-            chatBody.scrollTop = chatBody.scrollHeight;
+          chatBody.scrollTop = chatBody.scrollHeight;
         }
-
-        // Faster word-by-word animation
+ 
         await new Promise(resolve => {
-            setTimeout(resolve, 12);
+            setTimeout(resolve, 35);
         });
     }
 
     // Final render
-    contentElement.innerHTML =
-        formatBotText(text);
+      contentElement.innerHTML = formatBotText(text);
 
     if (typeof chatBody !== "undefined" && chatBody) {
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -2844,10 +2842,15 @@ async function handleUserSendMessage() {
         ) {
             console.log("✅ GEMINI SUCCESS");
 
-            await addWordByWordBotMessage(aiReply);
-
-            responseInProgress = false;
-            return;
+           try {
+    // existing Gemini + fallback logic
+} catch (error) {
+    // existing error handling
+} finally {
+    responseInProgress = false;
+    removeTyping();
+    updateSendButtonState();
+}
         }
 
         /*
