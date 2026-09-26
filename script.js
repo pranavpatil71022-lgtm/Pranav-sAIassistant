@@ -839,7 +839,7 @@ async function addStreamingBotMessage(text) {
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        await new Promise(resolve => setTimeout(resolve, 8));
+        await new Promise(resolve => setTimeout(resolve, 4));
     }
 
     // Make sure final formatting is correct
