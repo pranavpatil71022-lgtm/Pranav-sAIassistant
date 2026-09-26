@@ -2839,18 +2839,13 @@ async function handleUserSendMessage() {
         if (
             typeof aiReply === "string" &&
             aiReply.trim()
-        ) {
+        ){
             console.log("✅ GEMINI SUCCESS");
 
-           try {
-    // existing Gemini + fallback logic
-} catch (error) {
-    // existing error handling
-} finally {
-    responseInProgress = false;
-    removeTyping();
-    updateSendButtonState();
-}
+            await addWordByWordBotMessage(aiReply);
+
+            responseInProgress = false;
+            return;
         }
 
         /*
@@ -3015,7 +3010,7 @@ async function handleUserSendMessage() {
 
         if (fallbackReply !== null) {
             await addWordByWordBotMessage(
-              localReply.reply || localReply
+               fallbackReply.reply || fallbackReply
             );
 
             responseInProgress = false;
