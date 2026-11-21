@@ -1,4 +1,44 @@
+const MAX_MESSAGE_LENGTH = 4000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const MAX_REQUESTS_PER_WINDOW = 12;
+const requestBuckets = new Map();
+
+function getClientIp(request) {
+    const forwarded = request.headers["x-forwarded-for"];
+
+    if (typeof forwarded === "string" && forwarded.length > 0) {
+        return forwarded.split(",")[0].trim();
+    }
+
+    return request.socket?.remoteAddress || "unknown";
+}
+
+function isRateLimited(request) {
+    const now = Date.now();
+
+    for (const [ip, bucket] of requestBuckets) {
+        if (now - bucket.startedAt >= RATE_LIMIT_WINDOW_MS) {
+            requestBuckets.delete(ip);
+        }
+    }
+
+    const ip = getClientIp(request);
+    const bucket = requestBuckets.get(ip);
+
+    if (!bucket) {
+        requestBuckets.set(ip, { startedAt: now, count: 1 });
+        return false;
+    }
+
+    bucket.count += 1;
+    return bucket.count > MAX_REQUESTS_PER_WINDOW;
+}
+
 export default async function handler(request, response) {
+
+    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("Referrer-Policy", "same-origin");
 
     // =========================================================
     // METHOD CHECK
@@ -25,12 +65,6 @@ export default async function handler(request, response) {
             ? body.message.trim()
             : "";
 
-    const systemPrompt =
-        typeof body.systemPrompt === "string"
-            ? body.systemPrompt
-            : "";
-
-
     // =========================================================
     // VALIDATE MESSAGE
     // =========================================================
@@ -38,6 +72,18 @@ export default async function handler(request, response) {
     if (!message) {
         return response.status(400).json({
             reply: "Please enter a message."
+        });
+    }
+
+    if (message.length > MAX_MESSAGE_LENGTH) {
+        return response.status(413).json({
+            reply: "Please keep your message under 4,000 characters."
+        });
+    }
+
+    if (isRateLimited(request)) {
+        return response.status(429).json({
+            reply: "Too many requests. Please wait a minute and try again."
         });
     }
 
@@ -174,11 +220,6 @@ CORTEXFLOWAI BACKEND INSTRUCTIONS
 
 You are CortexFlowAI, an AI assistant created by Pranav Patil.
 
-USER QUESTION:
-
-${message}
-
-
 PRANAV PUBLIC PROFILE SOURCES:
 
 LinkedIn:
@@ -244,13 +285,7 @@ PROFILE RULES:
     // FINAL PROMPT
     // =========================================================
 
-    const finalPrompt = `
-${systemPrompt}
-
-${backendInstructions}
-
-${githubResearchInstructions}
-`;
+    const systemInstruction = `${backendInstructions}\n${githubResearchInstructions}`;
 
 
     // =========================================================
@@ -270,13 +305,23 @@ ${githubResearchInstructions}
 
                 body: JSON.stringify({
 
+                    // Keep application rules on the server and in Gemini's
+                    // system-instruction channel. Client input is only user data.
+                    systemInstruction: {
+                        parts: [
+                            {
+                                text: systemInstruction
+                            }
+                        ]
+                    },
+
                     contents: [
                         {
                             role: "user",
 
                             parts: [
                                 {
-                                    text: finalPrompt
+                                    text: message
                                 }
                             ]
                         }

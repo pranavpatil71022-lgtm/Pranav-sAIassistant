@@ -9041,15 +9041,3 @@ body.chat-open .chat-body{
     pointer-events: none;
 }
 }
-
-/* =========================================================
-   CORTEXFLOWAI — PREVENT INITIAL PORTFOLIO FLASH
-   ========================================================= */
-
-html.cortex-first-loading .main-content {
-    visibility: hidden !important;
-}
-
-html.cortex-first-loading .chat-widget {
-    visibility: visible !important;
-}

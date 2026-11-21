@@ -2047,8 +2047,7 @@ async function fetchAIReply(userMessage) {
             },
 
             body: JSON.stringify({
-                message: userMessage,
-                systemPrompt: SYSTEM_PROMPT
+                message: userMessage
             }),
 
             signal: controller.signal
@@ -3684,26 +3683,8 @@ window.addEventListener("load", () => {
 
                 loader.remove();
 
-                // ==========================================
-                // CORTEXFLOWAI IS THE FIRST SCREEN
-                // ==========================================
-
-                if (
-                    chatLauncher &&
-                    chatWidget &&
-                    !chatHistoryStateActive
-                ) {
-                    chatLauncher.click();
-
-                    // CortexFlowAI is now the visible first screen
-                    document.documentElement.classList.remove("cortex-first-loading");
-                }
-
-                setTimeout(() => {
-                  document.documentElement.classList.remove(
-                    "cortex-first-loading"
-                  );
-                }, 5000);
+                // Keep the portfolio as the landing experience. Visitors can
+                // open CortexFlowAI themselves from its launcher when ready.
 
             }, 500);
         }
